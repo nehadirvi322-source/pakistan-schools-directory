@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SchoolsHub.ai | Pakistan School Directory</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#17253b}
+header{background:#fff;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e9f0}
+.logo{font-size:24px;font-weight:bold;color:#116b66}
+button,select,input{font:inherit;padding:12px;border:1px solid #d8e0e9;border-radius:9px}
+button{cursor:pointer;background:#116b66;color:white;border:0}
+.hero{background:linear-gradient(120deg,#0e605d,#173c68);color:white;text-align:center;padding:65px 20px}
+.hero h1{font-size:38px;margin:0 0 15px}
+.hero p{font-size:17px}
+.search{display:flex;gap:10px;max-width:850px;margin:30px auto 0;background:white;padding:12px;border-radius:14px}
+.search input{flex:1;min-width:0}
+main{max-width:1150px;margin:35px auto;padding:0 20px}
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:25px}
+.filters select{background:white;min-width:180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.card{background:white;border:1px solid #e6eaf0;border-radius:15px;padding:25px}
+.card h3{margin-top:0;color:#116b66}
+.tag{display:inline-block;background:#e3f4ef;color:#116b66;padding:7px 12px;border-radius:20px;font-size:12px}
+.empty{background:white;border-radius:14px;padding:35px;text-align:center;color:#667085}
+footer{text-align:center;padding:30px;color:#667085}
+@media(max-width:600px){.search{flex-direction:column}.hero h1{font-size:29px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">SchoolsHub.ai</div>
+  <button onclick="toggleLanguage()" id="langBtn">اردو</button>
+</header>
+
+<section class="hero">
+  <h1 id="heading">Find the Right School in Pakistan</h1>
+  <p id="subtitle">Discover and compare private schools across Pakistan.</p>
+  <div class="search">
+    <input id="searchInput" placeholder="Search school name or city">
+    <button id="searchBtn" onclick="renderSchools()">Search</button>
+  </div>
+</section>
+
+<main>
+  <h2 id="sectionTitle">Explore Private Schools</h2>
+  <div class="filters">
+    <select id="province" onchange="renderSchools()">
+      <option value="">All Provinces & Territories</option>
+      <option>Punjab</option>
+      <option>Sindh</option>
+      <option>Khyber Pakhtunkhwa</option>
+      <option>Balochistan</option>
+      <option>Islamabad Capital Territory</option>
+      <option>Gilgit-Baltistan</option>
+      <option>Azad Jammu & Kashmir</option>
+    </select>
+  </div>
+  <div id="results" class="grid"></div>
+</main>
+
+<footer>SchoolsHub.ai — Free Pakistan Private School Directory</footer>
+
+<script>
+let language="en";
+let schools=[]; // Real schools will load from Supabase later.
+
+function renderSchools(){
+ const results=document.getElementById("results");
+ const term=document.getElementById("searchInput").value.toLowerCase();
+ const province=document.getElementById("province").value;
+ const matches=schools.filter(s=>
+   (!province||s.province===province)&&
+   (!term||(s.name+" "+s.city).toLowerCase().includes(term))
+ );
+ results.innerHTML="";
+ if(!matches.length){
+   const empty=document.createElement("div");
+   empty.className="empty";
+   empty.textContent=language==="en"
+     ?"School listings will appear here once added."
+     :"اسکولوں کی معلومات شامل ہونے کے بعد یہاں نظر آئیں گی۔";
+   results.appendChild(empty);
+   return;
+ }
+ matches.forEach(s=>{
+   const card=document.createElement("div");
+   card.className="card";
+   const name=document.createElement("h3");
+   name.textContent=s.name;
+   const location=document.createElement("p");
+   location.textContent=s.city+", "+s.province;
+   const tag=document.createElement("span");
+   tag.className="tag";
+   tag.textContent="Private School";
+   card.append(name,location,tag);
+   results.appendChild(card);
+ });
+}
+function toggleLanguage(){
+ language=language==="en"?"ur":"en";
+ document.documentElement.lang=language;
+ document.body.dir=language==="ur"?"rtl":"ltr";
+ document.getElementById("langBtn").textContent=language==="en"?"اردو":"English";
+ document.getElementById("heading").textContent=language==="en"
+   ?"Find the Right School in Pakistan":"پاکستان میں بہترین اسکول تلاش کریں";
+ document.getElementById("subtitle").textContent=language==="en"
+   ?"Discover and compare private schools across Pakistan."
+   :"پاکستان بھر کے نجی اسکول تلاش کریں اور موازنہ کریں۔";
+ document.getElementById("sectionTitle").textContent=language==="en"
+   ?"Explore Private Schools":"نجی اسکول تلاش کریں";
+ document.getElementById("searchBtn").textContent=language==="en"?"Search":"تلاش کریں";
+ document.getElementById("searchInput").placeholder=language==="en"
+   ?"Search school name or city":"اسکول یا شہر کا نام لکھیں";
+ document.getElementById("province").options[0].text=language==="en"
+   ?"All Provinces & Territories":"تمام صوبے اور علاقے";
+ renderSchools();
+}
+document.getElementById("searchInput").addEventListener("input",renderSchools);
+renderSchools();
+</script>
+</body>
+</html>
