@@ -1,125 +1,79 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SchoolsHub.ai | Pakistan School Directory</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#17253b}
-header{background:#fff;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e9f0}
-.logo{font-size:24px;font-weight:bold;color:#116b66}
-button,select,input{font:inherit;padding:12px;border:1px solid #d8e0e9;border-radius:9px}
-button{cursor:pointer;background:#116b66;color:white;border:0}
-.hero{background:linear-gradient(120deg,#0e605d,#173c68);color:white;text-align:center;padding:65px 20px}
-.hero h1{font-size:38px;margin:0 0 15px}
-.hero p{font-size:17px}
-.search{display:flex;gap:10px;max-width:850px;margin:30px auto 0;background:white;padding:12px;border-radius:14px}
-.search input{flex:1;min-width:0}
-main{max-width:1150px;margin:35px auto;padding:0 20px}
-.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:25px}
-.filters select{background:white;min-width:180px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
-.card{background:white;border:1px solid #e6eaf0;border-radius:15px;padding:25px}
-.card h3{margin-top:0;color:#116b66}
-.tag{display:inline-block;background:#e3f4ef;color:#116b66;padding:7px 12px;border-radius:20px;font-size:12px}
-.empty{background:white;border-radius:14px;padding:35px;text-align:center;color:#667085}
-footer{text-align:center;padding:30px;color:#667085}
-@media(max-width:600px){.search{flex-direction:column}.hero h1{font-size:29px}}
-</style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SchoolsHub.ai | Pakistan's private school directory</title>
+<meta name="description" content="Discover private schools across Pakistan. Search in English and Urdu." />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header>
-  <div class="logo">SchoolsHub.ai</div>
-  <button onclick="toggleLanguage()" id="langBtn">اردو</button>
+<header class="topbar">
+  <div class="topinner">
+    <button class="brand" id="homeLink" type="button"><span class="logo">🏫</span><span>SchoolsHub<span class="branddot">.ai</span></span></button>
+    <nav aria-label="Main navigation">
+      <button class="navbtn active" id="navDirectory" type="button" data-i18n="directory">Find Schools</button>
+      <button class="navbtn" id="navAdmin" type="button" data-i18n="admin">Super Admin</button>
+      <button class="navbtn lang" id="languageButton" type="button" aria-label="Switch language">اردو</button>
+    </nav>
+  </div>
 </header>
-
-<section class="hero">
-  <h1 id="heading">Find the Right School in Pakistan</h1>
-  <p id="subtitle">Discover and compare private schools across Pakistan.</p>
-  <div class="search">
-    <input id="searchInput" placeholder="Search school name or city">
-    <button id="searchBtn" onclick="renderSchools()">Search</button>
-  </div>
-</section>
-
 <main>
-  <h2 id="sectionTitle">Explore Private Schools</h2>
-  <div class="filters">
-    <select id="province" onchange="renderSchools()">
-      <option value="">All Provinces & Territories</option>
-      <option>Punjab</option>
-      <option>Sindh</option>
-      <option>Khyber Pakhtunkhwa</option>
-      <option>Balochistan</option>
-      <option>Islamabad Capital Territory</option>
-      <option>Gilgit-Baltistan</option>
-      <option>Azad Jammu & Kashmir</option>
-    </select>
-  </div>
-  <div id="results" class="grid"></div>
+  <section id="directoryView">
+    <div class="hero">
+      <div class="herotag" data-i18n="freeTag">FREE PRIVATE SCHOOL DIRECTORY</div>
+      <h1 data-i18n="heroTitle">Find the right school in Pakistan.</h1>
+      <p data-i18n="heroText">Explore private schools by province, district, city and area. Compare campuses, then choose with confidence.</p>
+      <div class="heroStats"><span>🇵🇰 <span data-i18n="wholePakistan">All Pakistan</span></span><span>✓ <span data-i18n="freeForever">Free to search</span></span><span>ا / A <span data-i18n="bilingual">English & Urdu</span></span></div>
+    </div>
+    <section class="searchpanel" aria-label="School filters">
+      <div class="searchgrid">
+        <label><span data-i18n="schoolName">School name</span><input id="nameFilter" data-ph="searchSchool" placeholder="Search schools…" autocomplete="off" /></label>
+        <label><span data-i18n="province">Province / territory</span><select id="provinceFilter"><option value="" data-i18n="allProvinces">All provinces</option></select></label>
+        <label><span data-i18n="district">District</span><select id="districtFilter"><option value="" data-i18n="allDistricts">All districts</option></select></label>
+        <label><span data-i18n="city">City</span><select id="cityFilter"><option value="" data-i18n="allCities">All cities</option></select></label>
+        <label><span data-i18n="area">Area</span><select id="areaFilter"><option value="" data-i18n="allAreas">All areas</option></select></label>
+      </div>
+      <div class="filterbottom"><button class="textbutton" id="clearFilters" type="button" data-i18n="clearFilters">Clear filters</button><span id="searchCount" class="secondary" role="status"></span></div>
+    </section>
+    <div id="publicNotice" class="status" role="status"></div>
+    <div class="resulttop"><h2 data-i18n="explore">Explore private schools</h2><span class="labelchip" data-i18n="verifiedOnly">Only published campuses appear</span></div>
+    <div class="cards" id="schoolCards"></div>
+  </section>
+  <section id="adminView" hidden>
+    <div class="adminhead"><div><span class="eyebrow" data-i18n="adminArea">SCHOOL MANAGEMENT</span><h1 data-i18n="adminDashboard">Super Admin dashboard</h1><p class="secondary" data-i18n="adminIntro">Manage private schools and campuses with your authorized account.</p></div><button type="button" class="outlined" id="adminSignOut" hidden data-i18n="signOut">Sign out</button></div>
+    <div id="setupPanel" class="panel">
+      <h2 data-i18n="connectTitle">Connect to your Supabase project</h2>
+      <p class="secondary" data-i18n="connectExpl">Enter your project URL and its public <strong>publishable</strong> key. Never enter secret or service-role keys here.</p>
+      <form id="configForm" class="formgrid">
+        <label><span>Supabase Project URL</span><input id="setupUrl" type="url" value="https://xmzrevedabfoehqrfi.supabase.co" required /></label>
+        <label><span>Publishable key (starts with sb_publishable_)</span><input id="setupKey" type="text" autocomplete="off" placeholder="sb_publishable_..." required /></label>
+        <div class="full formrow"><button class="primary" type="submit" data-i18n="connect">Connect</button><small class="secondary">These settings are stored in this browser for your own preview. They are not uploaded to GitHub by this page.</small></div>
+      </form>
+      <div class="status" id="configMessage" role="status"></div>
+    </div>
+    <div id="loginPanel" class="panel" hidden>
+      <div class="panelhead"><div><h2 data-i18n="adminSignIn">Administrator sign in</h2><p class="secondary" data-i18n="signInDesc">Use the Supabase Authentication account you created for SchoolsHub.ai.</p></div><button id="changeConnection" class="textbutton" type="button" data-i18n="connection">Connection settings</button></div>
+      <form id="loginForm" class="formgrid compact">
+        <label><span data-i18n="email">Email</span><input type="email" id="loginEmail" autocomplete="username" required /></label>
+        <label><span data-i18n="password">Password</span><input type="password" id="loginPassword" autocomplete="current-password" required /></label>
+        <div class="full"><button class="primary" id="loginButton" type="submit" data-i18n="signIn">Sign in</button></div>
+      </form>
+      <div class="status" id="loginMessage" role="status"></div>
+    </div>
+    <div id="adminData" hidden>
+      <div class="metrics"><div class="metric"><span data-i18n="schools">Schools</span><strong id="schoolMetric">—</strong></div><div class="metric"><span data-i18n="campuses">Campuses</span><strong id="campusMetric">—</strong></div><div class="metric"><span data-i18n="published">Published campuses</span><strong id="publishedMetric">—</strong></div></div>
+      <div class="admincolumns">
+        <section class="panel"><div class="panelhead"><h2 data-i18n="manageSchools">Manage schools</h2><button class="outlined" id="addSchoolButton" type="button" data-i18n="addSchool">+ Add school</button></div><div id="schoolManagement" class="dataitems"></div></section>
+        <section class="panel"><div class="panelhead"><h2 data-i18n="manageCampuses">Manage campuses</h2><button class="outlined" id="addCampusButton" type="button" data-i18n="addCampus">+ Add campus</button></div><div id="campusManagement" class="dataitems"></div></section>
+      </div>
+      <div id="adminMessage" class="status" role="status"></div>
+    </div>
+    <div id="blockedPanel" class="panel" hidden><h2 data-i18n="accessCheck">Administrator access check</h2><p id="blockedText"></p><button id="retryAdmin" class="outlined" type="button" data-i18n="retry">Try again</button><button id="blockedSignout" class="textbutton" type="button" data-i18n="signOut">Sign out</button></div>
+  </section>
 </main>
-
-<footer>SchoolsHub.ai — Free Pakistan Private School Directory</footer>
-
-<script>
-let language="en";
-let schools=[]; // Real schools will load from Supabase later.
-
-function renderSchools(){
- const results=document.getElementById("results");
- const term=document.getElementById("searchInput").value.toLowerCase();
- const province=document.getElementById("province").value;
- const matches=schools.filter(s=>
-   (!province||s.province===province)&&
-   (!term||(s.name+" "+s.city).toLowerCase().includes(term))
- );
- results.innerHTML="";
- if(!matches.length){
-   const empty=document.createElement("div");
-   empty.className="empty";
-   empty.textContent=language==="en"
-     ?"School listings will appear here once added."
-     :"اسکولوں کی معلومات شامل ہونے کے بعد یہاں نظر آئیں گی۔";
-   results.appendChild(empty);
-   return;
- }
- matches.forEach(s=>{
-   const card=document.createElement("div");
-   card.className="card";
-   const name=document.createElement("h3");
-   name.textContent=s.name;
-   const location=document.createElement("p");
-   location.textContent=s.city+", "+s.province;
-   const tag=document.createElement("span");
-   tag.className="tag";
-   tag.textContent="Private School";
-   card.append(name,location,tag);
-   results.appendChild(card);
- });
-}
-function toggleLanguage(){
- language=language==="en"?"ur":"en";
- document.documentElement.lang=language;
- document.body.dir=language==="ur"?"rtl":"ltr";
- document.getElementById("langBtn").textContent=language==="en"?"اردو":"English";
- document.getElementById("heading").textContent=language==="en"
-   ?"Find the Right School in Pakistan":"پاکستان میں بہترین اسکول تلاش کریں";
- document.getElementById("subtitle").textContent=language==="en"
-   ?"Discover and compare private schools across Pakistan."
-   :"پاکستان بھر کے نجی اسکول تلاش کریں اور موازنہ کریں۔";
- document.getElementById("sectionTitle").textContent=language==="en"
-   ?"Explore Private Schools":"نجی اسکول تلاش کریں";
- document.getElementById("searchBtn").textContent=language==="en"?"Search":"تلاش کریں";
- document.getElementById("searchInput").placeholder=language==="en"
-   ?"Search school name or city":"اسکول یا شہر کا نام لکھیں";
- document.getElementById("province").options[0].text=language==="en"
-   ?"All Provinces & Territories":"تمام صوبے اور علاقے";
- renderSchools();
-}
-document.getElementById("searchInput").addEventListener("input",renderSchools);
-renderSchools();
-</script>
+<div class="overlay" id="modalOverlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="panelhead"><h2 id="modalTitle">School</h2><button id="closeModal" type="button" class="iconbutton" aria-label="Close">✕</button></div><div id="modalBody"></div></div></div>
+<footer><span>© SchoolsHub.ai</span><span data-i18n="footerText">A free directory of private schools in Pakistan</span></footer>
+<script src="config.js"></script><script src="app.js" defer></script>
 </body>
 </html>

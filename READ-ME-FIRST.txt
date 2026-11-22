@@ -1,0 +1,22 @@
+SCHOOLSHUB.AI — NEXT STEP (ENGLISH + URDU)
+
+This is an improved preview. It has:
+- A school-discovery page with province, district, city and area filters.
+- A Super Admin page with Supabase sign-in and permission checks.
+- School creation/editing and campus creation/publishing for verified admins, after setup.
+
+STEP 1: Double-click index.html to open it in Safari.
+STEP 2: Click "Super Admin" at the top right. A dashboard screen should open.
+STEP 3: Click "Connect" only after inserting the public Publishable key you saved earlier.
+
+IMPORTANT SECURITY NOTES:
+- Only use a Supabase PUBLIC/PUBLISHABLE key (sb_publishable_...).
+- NEVER enter sb_secret_, service-role, or passwords into config.js or GitHub.
+- Only enter your password on the local sign-in form after you trust the files.
+- The Supabase Data API must expose relevant tables, and is_super_admin RPC must be exposed for the admin permission check.
+- Existing RLS policies must remain enabled and restrict administration using is_super_admin().
+- The first test campus was UNPUBLISHED, so it will not show in the public directory.
+- A locally saved connection setting in Safari only affects that browser. For a public deployment you must set the publishableKey in config.js, or configure the host to provide it. Publishable keys are public by design; secret keys are not.
+- Do not publish real student information, private contacts, or unverified school information.
+
+NEXT: Once you can open the Super Admin page, ask ChatGPT to guide you through connecting it to Supabase safely. We will do it one step at a time.
