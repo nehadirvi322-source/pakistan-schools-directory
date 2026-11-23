@@ -10,7 +10,7 @@ const dictionary = {
   directory:'اسکول تلاش کریں',admin:'سپر ایڈمن',freeTag:'مفت نجی اسکول ڈائریکٹری',heroTitle:'پاکستان میں اپنے بچوں کے لیے مناسب اسکول تلاش کریں۔',heroText:'صوبے، ضلع، شہر اور علاقے کے مطابق نجی اسکول تلاش کریں اور اسکول کیمپس کا موازنہ کریں۔',wholePakistan:'پورا پاکستان',freeForever:'تلاش بالکل مفت',bilingual:'اردو اور انگریزی',schoolName:'اسکول کا نام',searchSchool:'اسکول تلاش کریں…',province:'صوبہ / علاقہ',district:'ضلع',city:'شہر',area:'علاقہ',allProvinces:'تمام صوبے',allDistricts:'تمام اضلاع',allCities:'تمام شہر',allAreas:'تمام علاقے',clearFilters:'فلٹر صاف کریں',explore:'نجی اسکول دریافت کریں',verifiedOnly:'صرف شائع شدہ کیمپس دکھائے جاتے ہیں',adminArea:'اسکول مینجمنٹ',adminDashboard:'سپر ایڈمن ڈیش بورڈ',adminIntro:'اپنے مجاز اکاؤنٹ سے اسکولوں اور کیمپس کا انتظام کریں۔',signOut:'لاگ آؤٹ',connectTitle:'Supabase پراجیکٹ سے منسلک کریں',connectExpl:'اپنا پراجیکٹ URL اور پبلش ایبل کی درج کریں۔ خفیہ کی ہرگز درج نہ کریں۔',connect:'منسلک کریں',adminSignIn:'ایڈمن سائن اِن',signInDesc:'اپنا SchoolsHub.ai Supabase اکاؤنٹ استعمال کریں۔',connection:'کنکشن سیٹنگز',email:'ای میل',password:'پاس ورڈ',signIn:'سائن اِن',schools:'اسکول',campuses:'کیمپس',published:'شائع شدہ کیمپس',manageSchools:'اسکول مینجمنٹ',manageCampuses:'کیمپس مینجمنٹ',addSchool:'+ اسکول شامل کریں',addCampus:'+ کیمپس شامل کریں',accessCheck:'ایڈمن رسائی کی جانچ',retry:'دوبارہ کوشش کریں',footerText:'پاکستان میں نجی اسکولوں کی مفت ڈائریکٹری',noResults:'کوئی شائع شدہ کیمپس نہیں ملا۔',noPublished:'ابھی کوئی شائع شدہ کیمپس موجود نہیں۔ آپ کا ٹیسٹ کیمپس عوام کو نظر نہیں آئے گا۔',connectPreview:'پیش نظارہ: اصل ریکارڈ دکھانے کے لیے Supabase سے منسلک کریں۔',demo:'صرف نمونہ — اصل پبلک ریکارڈ نہیں',recordLabel:'نجی اسکول',locationUnknown:'مقام دستیاب نہیں',count:'شائع شدہ کیمپس',save:'محفوظ کریں',cancel:'منسوخ کریں',nameEn:'اسکول کا نام (انگریزی)',nameUr:'اسکول کا نام (اردو)',website:'ویب سائٹ (اختیاری)',campusName:'کیمپس کا نام',chooseSchool:'اسکول منتخب کریں',chooseArea:'علاقہ منتخب کریں',createSchool:'اسکول بنائیں',editSchool:'اسکول تبدیل کریں',createCampus:'کیمپس بنائیں',publish:'شائع کریں',unpublish:'چھپائیں',edit:'تبدیل کریں',passwordError:'ای میل اور پاس ورڈ درج کریں۔',loginSuccess:'سائن اِن ہو گیا۔ ایڈمن اجازت چیک ہو رہی ہے…',schoolSaved:'اسکول محفوظ ہو گیا۔',campusSaved:'کیمپس محفوظ ہو گیا۔',campusUpdated:'کیمپس کی حیثیت اپ ڈیٹ ہو گئی۔',publishConfirm:'کیا آپ یہ کیمپس عوامی ڈائریکٹری پر شائع کرنا چاہتے ہیں؟',unpublishConfirm:'کیا آپ یہ کیمپس عوام سے چھپانا چاہتے ہیں؟',setupSaved:'کنکشن اس براؤزر میں محفوظ ہو گیا۔ اب ایڈمن کے طور پر سائن اِن کریں۔',unauthorized:'اس اکاؤنٹ کو ڈائریکٹری میں تبدیلی کی اجازت نہیں ہے۔',permissionError:'ایڈمن اجازت کی تصدیق نہیں ہو سکی۔ Supabase Data API میں is_super_admin فنکشن کو ایکسپوز کریں، RLS بند نہ کریں۔',loaded:'Supabase سے شائع شدہ کیمپس دکھائے جا رہے ہیں۔',manageHint:'کیمپس شائع کرنے سے پہلے اس کی تمام معلومات چیک کریں۔'
  }
 };
-const state = { lang: 'en', view:'directory', config: {}, userToken: null, publicCampuses:[], schools:[], campuses:[], areas:[], locales:[], connected:false, isAdmin:false };
+const state = { lang: 'en', view:'directory', config: {}, userToken: null, publicCampuses:[], schools:[], campuses:[], areas:[], provinces:[], districts:[], cities:[], locales:[], connected:false, isAdmin:false };
 const t = (key) => dictionary[state.lang][key] || dictionary.en[key] || key;
 const asString = (x) => String(x ?? '');
 function setStatus(id,text,kind='') { const el=$(id); el.textContent=text;el.className='status'+(kind?' '+kind:''); }
@@ -75,13 +75,21 @@ async function checkAdminAccess(){
  }catch(error){state.isAdmin=false;$('blockedPanel').hidden=false;$('blockedText').textContent=t('permissionError')+' Details: '+friendlyError(error);}
 }
 async function loadAdmin(){
- const [schools,campuses,areas]=await Promise.all([
+ // Load district and city catalogs independently from areas.
+ // Districts are valid even when no city or neighborhood has been registered yet.
+ const [schools,campuses,areas,provinces,districts,cities]=await Promise.all([
   request('/rest/v1/schools?select=id,name,name_ur,website,school_type&order=name.asc&limit=500',{authenticated:true}),
   request('/rest/v1/campuses?select=id,school_id,area_id,campus_name,is_published&order=created_at.desc&limit=500',{authenticated:true}),
-  request('/rest/v1/areas?select=id,name,cities(id,name,districts(id,name,provinces(id,name)))&limit=500',{authenticated:true})
+  request('/rest/v1/areas?select=id,name,cities(id,name,districts(id,name,provinces(id,name)))&limit=1000',{authenticated:true}),
+  request('/rest/v1/provinces?select=id,name&order=name.asc&limit=1000',{authenticated:true}),
+  request('/rest/v1/districts?select=id,name,province_id&order=name.asc&limit=1000',{authenticated:true}),
+  request('/rest/v1/cities?select=id,name,district_id&order=name.asc&limit=1000',{authenticated:true})
  ]);
  state.schools=schools||[];
  state.campuses=campuses||[];
+ state.provinces=provinces||[];
+ state.districts=districts||[];
+ state.cities=cities||[];
  state.areas=(areas||[]).map(x=>({
   id:x.id,
   name:x.name,
@@ -105,13 +113,14 @@ function showModal(title,body){$('modalTitle').textContent=title;$('modalBody').
 function closeModal(){$('modalOverlay').hidden=true;$('modalBody').innerHTML='';}
 function schoolForm(school){const edit=!!school;showModal(edit?t('editSchool'):t('createSchool'),'<form id="schoolEditForm" class="formgrid"><label><span>'+t('nameEn')+'</span><input name="name" maxlength="250" required value="'+escapeHTML(school?.name||'')+'" /></label><label><span>'+t('nameUr')+'</span><input name="name_ur" maxlength="250" value="'+escapeHTML(school?.name_ur||'')+'" /></label><label class="full"><span>'+t('website')+'</span><input name="website" type="url" placeholder="https://example.com" value="'+escapeHTML(school?.website||'')+'" /></label><div class="full formrow"><button class="primary" type="submit">'+t('save')+'</button><button class="outlined" id="cancelSchool" type="button">'+t('cancel')+'</button></div><div class="full status" id="schoolFormStatus"></div></form>');$('cancelSchool').onclick=closeModal;$('schoolEditForm').onsubmit=async (event)=>{event.preventDefault();const data=new FormData(event.currentTarget);const payload={name:String(data.get('name')||'').trim(),name_ur:String(data.get('name_ur')||'').trim()||null,website:String(data.get('website')||'').trim()||null};try {if(!payload.name)throw Error('School name is required.');await request('/rest/v1/schools'+(edit?'?id=eq.'+encodeURIComponent(school.id):''),{method:edit?'PATCH':'POST',body:edit?payload:{...payload,school_type:'private'},authenticated:true,prefer:'return=minimal'});closeModal();await loadAdmin();setStatus('adminMessage',t('schoolSaved'),'ok');}catch(error){setStatus('schoolFormStatus',friendlyError(error),'error')}};}
 function campusForm(){
- if(!state.schools.length||!state.areas.length){
-  setStatus('adminMessage','Add a school and make sure areas exist before creating a campus.','error');
+ if(!state.schools.length){
+  setStatus('adminMessage','Add a school before creating a campus.','error');
   return;
  }
 
  // A school is the institution; the four location selectors describe a campus.
- // Options are built from the existing Supabase areas -> cities -> districts -> provinces relationships.
+ // Provinces and districts come from their own tables, not from area records.
+ // Cities are also independent; areas remain required to save a campus.
  const labels=state.lang==='ur' ? {
   province:'صوبہ منتخب کریں',district:'ضلع منتخب کریں',city:'شہر منتخب کریں',area:'علاقہ منتخب کریں'
  } : {
@@ -129,7 +138,7 @@ function campusForm(){
   '<label><span>'+escapeHTML(t('city'))+'</span><select id="campusCity" required disabled></select></label>'+
   '<label><span>'+escapeHTML(t('area'))+'</span><select id="campusArea" name="area_id" required disabled></select></label>'+
   '<label class="full"><span>'+escapeHTML(t('campusName'))+'</span><input name="campus_name" maxlength="250" placeholder="Hayatabad Campus" required /></label>'+
-  '<div class="full"><small class="secondary">'+escapeHTML(state.lang==='ur' ? 'نیا کیمپس پہلے غیر شائع شدہ رہے گا۔ تصدیق کے بعد شائع کریں۔' : 'New campuses are UNPUBLISHED by default. Review the record before publishing.')+'</small></div>'+
+  '<div class="full"><small class="secondary" id="campusLocationHint">'+escapeHTML(state.lang==='ur' ? 'ہر ضلع دکھایا جاتا ہے، چاہے اس کے شہر اور علاقے ابھی شامل نہ ہوں۔ کیمپس محفوظ کرنے کے لیے شہر اور علاقہ ضروری ہیں۔' : 'All registered districts appear, even if their cities or areas have not been added yet. A city and area are required to save a campus.')+'</small></div>'+
   '<div class="full formrow"><button class="primary" type="submit">'+escapeHTML(t('save'))+'</button><button class="outlined" id="cancelCampus" type="button">'+escapeHTML(t('cancel'))+'</button></div>'+
   '<div class="full status" id="campusFormStatus"></div></form>'
  );
@@ -151,25 +160,36 @@ function campusForm(){
   select.disabled=!enabled||items.length===0;
  };
  const availableAreas=state.areas.filter(a=>a.provinceId&&a.districtId&&a.cityId);
- showChoices(provinces,uniqueEntries(availableAreas,'provinceId','provinceName'),labels.province);
+ const locationHint=$('campusLocationHint');
+ const updateHint=(message)=>{locationHint.textContent=message;};
+ showChoices(provinces,sortEntries(state.provinces.map(p=>({id:p.id,name:p.name}))),labels.province);
  showChoices(districts,[],labels.district,false);
  showChoices(cities,[],labels.city,false);
  showChoices(areas,[],labels.area,false);
 
  provinces.onchange=()=>{
-  const matches=availableAreas.filter(a=>a.provinceId===provinces.value);
-  showChoices(districts,uniqueEntries(matches,'districtId','districtName'),labels.district,!!provinces.value);
+  const matchingDistricts=state.districts.filter(d=>d.province_id===provinces.value);
+  showChoices(districts,sortEntries(matchingDistricts.map(d=>({id:d.id,name:d.name}))),labels.district,!!provinces.value);
   showChoices(cities,[],labels.city,false);
   showChoices(areas,[],labels.area,false);
+  if(provinces.value)updateHint(state.lang==='ur'
+   ? `${matchingDistricts.length} اضلاع دستیاب ہیں۔ کیمپس محفوظ کرنے کے لیے شہر اور علاقہ بھی منتخب کریں۔`
+   : `${matchingDistricts.length} districts available. Select a city and area to save a campus.`);
  };
  districts.onchange=()=>{
-  const matches=availableAreas.filter(a=>a.provinceId===provinces.value&&a.districtId===districts.value);
-  showChoices(cities,uniqueEntries(matches,'cityId','cityName'),labels.city,!!districts.value);
+  const matchingCities=state.cities.filter(c=>c.district_id===districts.value);
+  showChoices(cities,sortEntries(matchingCities.map(c=>({id:c.id,name:c.name}))),labels.city,!!districts.value);
   showChoices(areas,[],labels.area,false);
+  if(districts.value&&!matchingCities.length)updateHint(state.lang==='ur'
+   ? 'اس ضلع کا شہر ابھی ڈیٹابیس میں موجود نہیں۔ کیمپس بنانے سے پہلے شہر اور علاقہ شامل کریں۔'
+   : 'This district has no cities in the database yet. Add its city and area before creating a campus.');
  };
  cities.onchange=()=>{
-  const matches=availableAreas.filter(a=>a.provinceId===provinces.value&&a.districtId===districts.value&&a.cityId===cities.value);
+  const matches=availableAreas.filter(a=>a.cityId===cities.value);
   showChoices(areas,sortEntries(matches.map(a=>({id:a.id,name:a.name}))),labels.area,!!cities.value);
+  if(cities.value&&!matches.length)updateHint(state.lang==='ur'
+   ? 'اس شہر کا علاقہ ابھی موجود نہیں۔ کیمپس بنانے سے پہلے علاقہ شامل کریں۔'
+   : 'This city has no areas in the database yet. Add an area before creating a campus.');
  };
 
  $('campusEditForm').onsubmit=async(event)=>{
@@ -196,7 +216,7 @@ function campusForm(){
  };
 }
 async function toggleCampus(id){const campus=state.campuses.find(c=>c.id===id);if(!campus)return;const next=!campus.is_published;if(!window.confirm(t(next?'publishConfirm':'unpublishConfirm')))return;try{await request('/rest/v1/campuses?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:{is_published:next},authenticated:true,prefer:'return=minimal'});await loadAdmin();await loadPublic();setStatus('adminMessage',t('campusUpdated'),'ok')}catch(error){setStatus('adminMessage',friendlyError(error),'error')}}
-async function signOut(){const token=state.userToken;state.userToken=null;state.isAdmin=false;state.schools=[];state.campuses=[];state.areas=[];try{if(token)await fetch(state.config.supabaseUrl.replace(/\/$/,'')+'/auth/v1/logout',{method:'POST',headers:{apikey:state.config.publishableKey,Authorization:'Bearer '+token}})}catch{}showAdminState();}
+async function signOut(){const token=state.userToken;state.userToken=null;state.isAdmin=false;state.schools=[];state.campuses=[];state.areas=[];state.provinces=[];state.districts=[];state.cities=[];try{if(token)await fetch(state.config.supabaseUrl.replace(/\/$/,'')+'/auth/v1/logout',{method:'POST',headers:{apikey:state.config.publishableKey,Authorization:'Bearer '+token}})}catch{}showAdminState();}
 
 // UI events
 $('homeLink').onclick=()=>switchView('directory');$('navDirectory').onclick=()=>switchView('directory');$('navAdmin').onclick=()=>switchView('admin');$('languageButton').onclick=()=>{state.lang=state.lang==='en'?'ur':'en';updateLabels();populateFilters()};
