@@ -78,23 +78,122 @@ async function loadAdmin(){
  const [schools,campuses,areas]=await Promise.all([
   request('/rest/v1/schools?select=id,name,name_ur,website,school_type&order=name.asc&limit=500',{authenticated:true}),
   request('/rest/v1/campuses?select=id,school_id,area_id,campus_name,is_published&order=created_at.desc&limit=500',{authenticated:true}),
-  request('/rest/v1/areas?select=id,name,cities(name,districts(name,provinces(name)))&limit=500',{authenticated:true})
+  request('/rest/v1/areas?select=id,name,cities(id,name,districts(id,name,provinces(id,name)))&limit=500',{authenticated:true})
  ]);
- state.schools=schools||[];state.campuses=campuses||[];state.areas=(areas||[]).map(x=>({id:x.id,name:x.name,location:[x.cities?.name,x.cities?.districts?.name,x.cities?.districts?.provinces?.name].filter(Boolean).join(' · ')}));renderAdmin();
+ state.schools=schools||[];
+ state.campuses=campuses||[];
+ state.areas=(areas||[]).map(x=>({
+  id:x.id,
+  name:x.name,
+  cityId:x.cities?.id||'',
+  cityName:x.cities?.name||'',
+  districtId:x.cities?.districts?.id||'',
+  districtName:x.cities?.districts?.name||'',
+  provinceId:x.cities?.districts?.provinces?.id||'',
+  provinceName:x.cities?.districts?.provinces?.name||'',
+  location:[x.cities?.name,x.cities?.districts?.name,x.cities?.districts?.provinces?.name].filter(Boolean).join(' · ')
+ }));
+ renderAdmin();
 }
 function renderAdmin(){
  if(!state.isAdmin)return;
  $('schoolMetric').textContent=state.schools.length;$('campusMetric').textContent=state.campuses.length;$('publishedMetric').textContent=state.campuses.filter(x=>x.is_published===true).length;
  $('schoolManagement').innerHTML=state.schools.length?state.schools.map(s=>'<div class="dataitem"><strong>'+escapeHTML(localizedName(s))+'</strong><p>'+escapeHTML(s.website||'')+'</p><div class="actions"><button class="actionbtn" type="button" data-action="edit-school" data-id="'+escapeHTML(s.id)+'">'+escapeHTML(t('edit'))+'</button></div></div>').join(''):'<div class="secondary">No schools yet.</div>';
- $('campusManagement').innerHTML=state.campuses.length?state.campuses.map(c=>{const school=state.schools.find(s=>s.id===c.school_id),area=state.areas.find(a=>a.id===c.area_id);return '<div class="dataitem"><strong>'+escapeHTML(c.campus_name||'Main campus')+'</strong><p>'+escapeHTML(school?.name||'School')+' · '+escapeHTML(area?.name||'Unknown area')+'</p><span class="tag">'+(c.is_published?'Published':'Unpublished')+'</span><div class="actions"><button class="actionbtn '+(c.is_published?'warning':'')+'" type="button" data-action="toggle-campus" data-id="'+escapeHTML(c.id)+'">'+escapeHTML(c.is_published?t('unpublish'):t('publish'))+'</button></div></div>'}).join(''):'<div class="secondary">No campuses yet.</div>';
+ $('campusManagement').innerHTML=state.campuses.length?state.campuses.map(c=>{const school=state.schools.find(s=>s.id===c.school_id),area=state.areas.find(a=>a.id===c.area_id);return '<div class="dataitem"><strong>'+escapeHTML(c.campus_name||'Main campus')+'</strong><p>'+escapeHTML(school?.name||'School')+' · '+escapeHTML(area ? [area.name,area.location].filter(Boolean).join(' · ') : 'Unknown area')+'</p><span class="tag">'+(c.is_published?'Published':'Unpublished')+'</span><div class="actions"><button class="actionbtn '+(c.is_published?'warning':'')+'" type="button" data-action="toggle-campus" data-id="'+escapeHTML(c.id)+'">'+escapeHTML(c.is_published?t('unpublish'):t('publish'))+'</button></div></div>'}).join(''):'<div class="secondary">No campuses yet.</div>';
 }
 function showModal(title,body){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modalOverlay').hidden=false;}
 function closeModal(){$('modalOverlay').hidden=true;$('modalBody').innerHTML='';}
 function schoolForm(school){const edit=!!school;showModal(edit?t('editSchool'):t('createSchool'),'<form id="schoolEditForm" class="formgrid"><label><span>'+t('nameEn')+'</span><input name="name" maxlength="250" required value="'+escapeHTML(school?.name||'')+'" /></label><label><span>'+t('nameUr')+'</span><input name="name_ur" maxlength="250" value="'+escapeHTML(school?.name_ur||'')+'" /></label><label class="full"><span>'+t('website')+'</span><input name="website" type="url" placeholder="https://example.com" value="'+escapeHTML(school?.website||'')+'" /></label><div class="full formrow"><button class="primary" type="submit">'+t('save')+'</button><button class="outlined" id="cancelSchool" type="button">'+t('cancel')+'</button></div><div class="full status" id="schoolFormStatus"></div></form>');$('cancelSchool').onclick=closeModal;$('schoolEditForm').onsubmit=async (event)=>{event.preventDefault();const data=new FormData(event.currentTarget);const payload={name:String(data.get('name')||'').trim(),name_ur:String(data.get('name_ur')||'').trim()||null,website:String(data.get('website')||'').trim()||null};try {if(!payload.name)throw Error('School name is required.');await request('/rest/v1/schools'+(edit?'?id=eq.'+encodeURIComponent(school.id):''),{method:edit?'PATCH':'POST',body:edit?payload:{...payload,school_type:'private'},authenticated:true,prefer:'return=minimal'});closeModal();await loadAdmin();setStatus('adminMessage',t('schoolSaved'),'ok');}catch(error){setStatus('schoolFormStatus',friendlyError(error),'error')}};}
-function campusForm(){if(!state.schools.length||!state.areas.length){setStatus('adminMessage','Add a school and make sure areas exist before creating a campus.','error');return;}
- const schoolOptions=state.schools.map(s=>'<option value="'+escapeHTML(s.id)+'">'+escapeHTML(s.name)+'</option>').join('');
- const areaOptions=state.areas.map(a=>'<option value="'+escapeHTML(a.id)+'">'+escapeHTML(a.name+' — '+a.location)+'</option>').join('');
- showModal(t('createCampus'),'<form id="campusEditForm" class="formgrid"><label><span>'+t('chooseSchool')+'</span><select name="school_id" required>'+schoolOptions+'</select></label><label><span>'+t('chooseArea')+'</span><select name="area_id" required>'+areaOptions+'</select></label><label class="full"><span>'+t('campusName')+'</span><input name="campus_name" maxlength="250" placeholder="Hayatabad Campus" required /></label><div class="full"><small class="secondary">New campuses are UNPUBLISHED by default. Review the record before publishing.</small></div><div class="full formrow"><button class="primary" type="submit">'+t('save')+'</button><button class="outlined" id="cancelCampus" type="button">'+t('cancel')+'</button></div><div class="full status" id="campusFormStatus"></div></form>');$('cancelCampus').onclick=closeModal;$('campusEditForm').onsubmit=async(event)=>{event.preventDefault();const data=new FormData(event.currentTarget);const payload={school_id:String(data.get('school_id')),area_id:String(data.get('area_id')),campus_name:String(data.get('campus_name')||'').trim(),is_published:false};try{await request('/rest/v1/campuses',{method:'POST',body:payload,authenticated:true,prefer:'return=minimal'});closeModal();await loadAdmin();setStatus('adminMessage',t('campusSaved'),'ok');}catch(error){setStatus('campusFormStatus',friendlyError(error),'error')}};
+function campusForm(){
+ if(!state.schools.length||!state.areas.length){
+  setStatus('adminMessage','Add a school and make sure areas exist before creating a campus.','error');
+  return;
+ }
+
+ // A school is the institution; the four location selectors describe a campus.
+ // Options are built from the existing Supabase areas -> cities -> districts -> provinces relationships.
+ const labels=state.lang==='ur' ? {
+  province:'صوبہ منتخب کریں',district:'ضلع منتخب کریں',city:'شہر منتخب کریں',area:'علاقہ منتخب کریں'
+ } : {
+  province:'Choose a province',district:'Choose a district',city:'Choose a city',area:'Choose an area'
+ };
+ const schoolOptions='<option value="">'+escapeHTML(t('chooseSchool'))+'</option>'+state.schools.map(s=>
+  '<option value="'+escapeHTML(s.id)+'">'+escapeHTML(localizedName(s))+'</option>'
+ ).join('');
+
+ showModal(t('createCampus'),
+  '<form id="campusEditForm" class="formgrid" style="max-height:67vh;overflow-y:auto;padding-right:4px">'+
+  '<label class="full"><span>'+escapeHTML(t('chooseSchool'))+'</span><select id="campusSchool" name="school_id" required>'+schoolOptions+'</select></label>'+
+  '<label><span>'+escapeHTML(t('province'))+'</span><select id="campusProvince" required></select></label>'+
+  '<label><span>'+escapeHTML(t('district'))+'</span><select id="campusDistrict" required disabled></select></label>'+
+  '<label><span>'+escapeHTML(t('city'))+'</span><select id="campusCity" required disabled></select></label>'+
+  '<label><span>'+escapeHTML(t('area'))+'</span><select id="campusArea" name="area_id" required disabled></select></label>'+
+  '<label class="full"><span>'+escapeHTML(t('campusName'))+'</span><input name="campus_name" maxlength="250" placeholder="Hayatabad Campus" required /></label>'+
+  '<div class="full"><small class="secondary">'+escapeHTML(state.lang==='ur' ? 'نیا کیمپس پہلے غیر شائع شدہ رہے گا۔ تصدیق کے بعد شائع کریں۔' : 'New campuses are UNPUBLISHED by default. Review the record before publishing.')+'</small></div>'+
+  '<div class="full formrow"><button class="primary" type="submit">'+escapeHTML(t('save'))+'</button><button class="outlined" id="cancelCampus" type="button">'+escapeHTML(t('cancel'))+'</button></div>'+
+  '<div class="full status" id="campusFormStatus"></div></form>'
+ );
+ $('cancelCampus').onclick=closeModal;
+ const provinces=$('campusProvince'),districts=$('campusDistrict'),cities=$('campusCity'),areas=$('campusArea');
+ const sortEntries=entries=>entries.sort((a,b)=>a.name.localeCompare(b.name));
+ const uniqueEntries=(items,idField,nameField)=>{
+  const map=new Map();
+  for(const item of items){
+   const id=item[idField],name=item[nameField];
+   if(id&&name&&!map.has(id))map.set(id,{id,name});
+  }
+  return sortEntries([...map.values()]);
+ };
+ const showChoices=(select,items,placeholder,enabled=true)=>{
+  select.innerHTML='<option value="">'+escapeHTML(placeholder)+'</option>'+items.map(item=>
+   '<option value="'+escapeHTML(item.id)+'">'+escapeHTML(item.name)+'</option>'
+  ).join('');
+  select.disabled=!enabled||items.length===0;
+ };
+ const availableAreas=state.areas.filter(a=>a.provinceId&&a.districtId&&a.cityId);
+ showChoices(provinces,uniqueEntries(availableAreas,'provinceId','provinceName'),labels.province);
+ showChoices(districts,[],labels.district,false);
+ showChoices(cities,[],labels.city,false);
+ showChoices(areas,[],labels.area,false);
+
+ provinces.onchange=()=>{
+  const matches=availableAreas.filter(a=>a.provinceId===provinces.value);
+  showChoices(districts,uniqueEntries(matches,'districtId','districtName'),labels.district,!!provinces.value);
+  showChoices(cities,[],labels.city,false);
+  showChoices(areas,[],labels.area,false);
+ };
+ districts.onchange=()=>{
+  const matches=availableAreas.filter(a=>a.provinceId===provinces.value&&a.districtId===districts.value);
+  showChoices(cities,uniqueEntries(matches,'cityId','cityName'),labels.city,!!districts.value);
+  showChoices(areas,[],labels.area,false);
+ };
+ cities.onchange=()=>{
+  const matches=availableAreas.filter(a=>a.provinceId===provinces.value&&a.districtId===districts.value&&a.cityId===cities.value);
+  showChoices(areas,sortEntries(matches.map(a=>({id:a.id,name:a.name}))),labels.area,!!cities.value);
+ };
+
+ $('campusEditForm').onsubmit=async(event)=>{
+  event.preventDefault();
+  const data=new FormData(event.currentTarget);
+  const payload={
+   school_id:String(data.get('school_id')||''),
+   area_id:String(data.get('area_id')||''),
+   campus_name:String(data.get('campus_name')||'').trim(),
+   is_published:false
+  };
+  try{
+   if(!state.schools.some(s=>s.id===payload.school_id))throw Error('Please choose a school.');
+   const selectedArea=availableAreas.find(a=>a.id===payload.area_id);
+   if(!selectedArea||selectedArea.provinceId!==provinces.value||selectedArea.districtId!==districts.value||selectedArea.cityId!==cities.value){
+    throw Error('Please select a province, district, city and area in order.');
+   }
+   if(!payload.campus_name)throw Error('Please enter the campus name.');
+   await request('/rest/v1/campuses',{method:'POST',body:payload,authenticated:true,prefer:'return=minimal'});
+   closeModal();
+   await loadAdmin();
+   setStatus('adminMessage',t('campusSaved'),'ok');
+  }catch(error){setStatus('campusFormStatus',friendlyError(error),'error');}
+ };
 }
 async function toggleCampus(id){const campus=state.campuses.find(c=>c.id===id);if(!campus)return;const next=!campus.is_published;if(!window.confirm(t(next?'publishConfirm':'unpublishConfirm')))return;try{await request('/rest/v1/campuses?id=eq.'+encodeURIComponent(id),{method:'PATCH',body:{is_published:next},authenticated:true,prefer:'return=minimal'});await loadAdmin();await loadPublic();setStatus('adminMessage',t('campusUpdated'),'ok')}catch(error){setStatus('adminMessage',friendlyError(error),'error')}}
 async function signOut(){const token=state.userToken;state.userToken=null;state.isAdmin=false;state.schools=[];state.campuses=[];state.areas=[];try{if(token)await fetch(state.config.supabaseUrl.replace(/\/$/,'')+'/auth/v1/logout',{method:'POST',headers:{apikey:state.config.publishableKey,Authorization:'Bearer '+token}})}catch{}showAdminState();}
