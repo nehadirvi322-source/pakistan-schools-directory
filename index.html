@@ -1,79 +1,37 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SchoolsHub.ai | Pakistan's private school directory</title>
-<meta name="description" content="Discover private schools across Pakistan. Search in English and Urdu." />
-<link rel="stylesheet" href="styles.css" />
+ <meta charset="utf-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <meta name="description" content="SchoolsHub.ai — find private schools across Pakistan by province, district and tehsil." />
+ <title>SchoolsHub.ai | Find Schools in Pakistan</title>
+ <style>
+ :root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#173349;background:#f5f8fb;--teal:#087f72;--line:#dce6ef;--muted:#5c7285}
+ *{box-sizing:border-box} body{margin:0} [hidden]{display:none!important} button,input,select{font:inherit} button{cursor:pointer} button:disabled{opacity:.55;cursor:not-allowed}
+ a{color:var(--teal)} header{background:#fff;border-bottom:1px solid var(--line)} .topbar{max-width:1220px;margin:auto;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.brand{font-size:25px;font-weight:800;text-decoration:none;color:#11746c}nav{display:flex;gap:10px;flex-wrap:wrap}
+ button,.actionbtn,.maplink{border:1px solid #cadce6;background:#fff;border-radius:10px;padding:11px 17px;color:#1d5267;text-decoration:none;display:inline-block} button.active,.primary,.maplink{background:var(--teal);border-color:var(--teal);color:white}.outlined{background:white;color:#1d5267}.warning{color:#a23d30;border-color:#f1d1ce}
+ main{max-width:1220px;margin:auto;padding:30px 20px 60px} h1{font-size:clamp(28px,4vw,46px);margin:0 0 16px}h2{font-size:23px}h3{margin:8px 0}p{line-height:1.6}.hero{background:linear-gradient(115deg,#087f72,#195b96);color:white;border-radius:22px;padding:42px 38px}.hero p{max-width:750px;font-size:18px}.eyebrow{font-size:12px;font-weight:800;letter-spacing:.13em;opacity:.8}.hero .chips{display:flex;gap:12px;flex-wrap:wrap}.hero .chips span{border:1px solid #ffffff66;border-radius:99px;padding:7px 12px;font-size:13px}
+ .searchbox,.panel,.schoolcard,.metric,.dataitem{background:white;border:1px solid var(--line);border-radius:16px;padding:22px}.searchbox{margin:24px 0}.searchgrid{display:grid;grid-template-columns:2fr repeat(3,minmax(140px,1fr));gap:12px}label{display:flex;flex-direction:column;gap:7px;font-size:14px;font-weight:650}input,select{background:white;color:#163447;border:1px solid #cddde9;border-radius:10px;padding:13px;min-width:0;width:100%}input[readonly]{background:#edf3f7}.toolbar{margin-top:12px;display:flex;justify-content:flex-end}.secondary,.small{color:var(--muted);font-size:14px}.status{margin:10px 0}.status.error{color:#b42318}.status.ok{color:#077e55}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}.tag{background:#e2f6ef;color:#0b7560;font-weight:750;border-radius:999px;padding:5px 9px;font-size:12px}.schoolcard{min-height:190px}.schoolcard h3{margin-top:14px}.schoolcard .maplink{margin-top:5px}.empty{padding:34px;text-align:center;color:var(--muted);background:white;border:1px dashed #cddde9;border-radius:14px}.headline{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}.metric strong{font-size:32px;display:block;color:var(--teal)}.management{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panelhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.dataitem{padding:16px;margin:12px 0}.dataitem p{margin:6px 0}.actions{margin-top:10px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px;max-height:70vh;overflow:auto;padding:3px}.formgrid .full{grid-column:1/-1}.formrow{display:flex;gap:10px;align-items:center}.panel form{display:grid;gap:14px;max-width:540px}.panel{margin:18px 0}.notice{background:#fff5de;border:1px solid #ebd7ad;border-radius:9px;padding:12px}.modalOverlay{position:fixed;inset:0;background:#123244aa;display:grid;place-items:center;padding:20px;z-index:20}.modal{width:min(100%,710px);background:white;border-radius:20px;padding:26px;box-shadow:0 18px 90px #0003}.modalheading{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.modalheading h2{margin:0}footer{text-align:center;padding:30px;color:var(--muted);border-top:1px solid var(--line)}
+ @media(max-width:820px){.searchgrid{grid-template-columns:repeat(2,1fr)}.management{grid-template-columns:1fr}}@media(max-width:520px){.searchgrid,.metrics,.formgrid{grid-template-columns:1fr}.formgrid .full{grid-column:auto}.hero{padding:30px 20px}.topbar{justify-content:center}}
+ </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="topinner">
-    <button class="brand" id="homeLink" type="button"><span class="logo">🏫</span><span>SchoolsHub<span class="branddot">.ai</span></span></button>
-    <nav aria-label="Main navigation">
-      <button class="navbtn active" id="navDirectory" type="button" data-i18n="directory">Find Schools</button>
-      <button class="navbtn" id="navAdmin" type="button" data-i18n="admin">Super Admin</button>
-      <button class="navbtn lang" id="languageButton" type="button" aria-label="Switch language">اردو</button>
-    </nav>
-  </div>
-</header>
-<main>
+ <header><div class="topbar"><a class="brand" href="#" id="homeLink">🏫 SchoolsHub.ai</a><nav><button id="navDirectory" class="active" type="button" data-i18n="directory">Find Schools</button><button id="navAdmin" type="button" data-i18n="admin">Super Admin</button><button id="languageButton" type="button">اردو</button></nav></div></header>
+ <main>
   <section id="directoryView">
-    <div class="hero">
-      <div class="herotag" data-i18n="freeTag">FREE PRIVATE SCHOOL DIRECTORY</div>
-      <h1 data-i18n="heroTitle">Find the right school in Pakistan.</h1>
-      <p data-i18n="heroText">Explore private schools by province, district, city and area. Compare campuses, then choose with confidence.</p>
-      <div class="heroStats"><span>🇵🇰 <span data-i18n="wholePakistan">All Pakistan</span></span><span>✓ <span data-i18n="freeForever">Free to search</span></span><span>ا / A <span data-i18n="bilingual">English & Urdu</span></span></div>
-    </div>
-    <section class="searchpanel" aria-label="School filters">
-      <div class="searchgrid">
-        <label><span data-i18n="schoolName">School name</span><input id="nameFilter" data-ph="searchSchool" placeholder="Search schools…" autocomplete="off" /></label>
-        <label><span data-i18n="province">Province / territory</span><select id="provinceFilter"><option value="" data-i18n="allProvinces">All provinces</option></select></label>
-        <label><span data-i18n="district">District</span><select id="districtFilter"><option value="" data-i18n="allDistricts">All districts</option></select></label>
-        <label><span data-i18n="city">City</span><select id="cityFilter"><option value="" data-i18n="allCities">All cities</option></select></label>
-        <label><span data-i18n="area">Area</span><select id="areaFilter"><option value="" data-i18n="allAreas">All areas</option></select></label>
-      </div>
-      <div class="filterbottom"><button class="textbutton" id="clearFilters" type="button" data-i18n="clearFilters">Clear filters</button><span id="searchCount" class="secondary" role="status"></span></div>
-    </section>
-    <div id="publicNotice" class="status" role="status"></div>
-    <div class="resulttop"><h2 data-i18n="explore">Explore private schools</h2><span class="labelchip" data-i18n="verifiedOnly">Only published campuses appear</span></div>
-    <div class="cards" id="schoolCards"></div>
+   <div class="hero"><p class="eyebrow" data-i18n="freeTag">FREE PRIVATE SCHOOL DIRECTORY</p><h1 data-i18n="heroTitle">Find the right school in Pakistan.</h1><p data-i18n="heroText">Explore private schools by province, district and tehsil. Compare campuses, then choose with confidence.</p><div class="chips"><span data-i18n="wholePakistan">All Pakistan</span><span data-i18n="freeForever">Free to search</span><span data-i18n="bilingual">English &amp; Urdu</span></div></div>
+   <section class="searchbox"><div class="searchgrid"><label><span data-i18n="searchSchool">Search schools…</span><input id="nameFilter" data-ph="searchSchool" placeholder="Search schools…" /></label><label><span data-i18n="province">Province / territory</span><select id="provinceFilter"><option>All provinces</option></select></label><label><span data-i18n="district">District</span><select id="districtFilter"><option>All districts</option></select></label><label><span data-i18n="tehsil">Tehsil</span><select id="tehsilFilter"><option>All tehsils</option></select></label></div><div class="toolbar"><button id="clearFilters" type="button" data-i18n="clearFilters">Clear filters</button></div></section>
+   <div class="headline"><h2 data-i18n="explore">Explore private schools</h2><span class="secondary" id="searchCount"></span></div><p class="status" id="publicNotice"></p><div id="schoolCards" class="cards"></div>
   </section>
-  <section id="adminView" hidden>
-    <div class="adminhead"><div><span class="eyebrow" data-i18n="adminArea">SCHOOL MANAGEMENT</span><h1 data-i18n="adminDashboard">Super Admin dashboard</h1><p class="secondary" data-i18n="adminIntro">Manage private schools and campuses with your authorized account.</p></div><button type="button" class="outlined" id="adminSignOut" hidden data-i18n="signOut">Sign out</button></div>
-    <div id="setupPanel" class="panel">
-      <h2 data-i18n="connectTitle">Connect to your Supabase project</h2>
-      <p class="secondary" data-i18n="connectExpl">Enter your project URL and its public <strong>publishable</strong> key. Never enter secret or service-role keys here.</p>
-      <form id="configForm" class="formgrid">
-        <label><span>Supabase Project URL</span><input id="setupUrl" type="url" value="https://xmzrevedabfoehqrfi.supabase.co" required /></label>
-        <label><span>Publishable key (starts with sb_publishable_)</span><input id="setupKey" type="text" autocomplete="off" placeholder="sb_publishable_..." required /></label>
-        <div class="full formrow"><button class="primary" type="submit" data-i18n="connect">Connect</button><small class="secondary">These settings are stored in this browser for your own preview. They are not uploaded to GitHub by this page.</small></div>
-      </form>
-      <div class="status" id="configMessage" role="status"></div>
-    </div>
-    <div id="loginPanel" class="panel" hidden>
-      <div class="panelhead"><div><h2 data-i18n="adminSignIn">Administrator sign in</h2><p class="secondary" data-i18n="signInDesc">Use the Supabase Authentication account you created for SchoolsHub.ai.</p></div><button id="changeConnection" class="textbutton" type="button" data-i18n="connection">Connection settings</button></div>
-      <form id="loginForm" class="formgrid compact">
-        <label><span data-i18n="email">Email</span><input type="email" id="loginEmail" autocomplete="username" required /></label>
-        <label><span data-i18n="password">Password</span><input type="password" id="loginPassword" autocomplete="current-password" required /></label>
-        <div class="full"><button class="primary" id="loginButton" type="submit" data-i18n="signIn">Sign in</button></div>
-      </form>
-      <div class="status" id="loginMessage" role="status"></div>
-    </div>
-    <div id="adminData" hidden>
-      <div class="metrics"><div class="metric"><span data-i18n="schools">Schools</span><strong id="schoolMetric">—</strong></div><div class="metric"><span data-i18n="campuses">Campuses</span><strong id="campusMetric">—</strong></div><div class="metric"><span data-i18n="published">Published campuses</span><strong id="publishedMetric">—</strong></div></div>
-      <div class="admincolumns">
-        <section class="panel"><div class="panelhead"><h2 data-i18n="manageSchools">Manage schools</h2><button class="outlined" id="addSchoolButton" type="button" data-i18n="addSchool">+ Add school</button></div><div id="schoolManagement" class="dataitems"></div></section>
-        <section class="panel"><div class="panelhead"><h2 data-i18n="manageCampuses">Manage campuses</h2><button class="outlined" id="addCampusButton" type="button" data-i18n="addCampus">+ Add campus</button></div><div id="campusManagement" class="dataitems"></div></section>
-      </div>
-      <div id="adminMessage" class="status" role="status"></div>
-    </div>
-    <div id="blockedPanel" class="panel" hidden><h2 data-i18n="accessCheck">Administrator access check</h2><p id="blockedText"></p><button id="retryAdmin" class="outlined" type="button" data-i18n="retry">Try again</button><button id="blockedSignout" class="textbutton" type="button" data-i18n="signOut">Sign out</button></div>
+  <section id="adminView" hidden><p class="eyebrow" data-i18n="adminArea">SCHOOL MANAGEMENT</p><div class="headline"><div><h1 data-i18n="adminDashboard">Super Admin dashboard</h1><p class="secondary" data-i18n="adminIntro">Manage private schools and campuses with your authorized account.</p></div><button id="adminSignOut" type="button" hidden data-i18n="signOut">Sign out</button></div>
+   <section id="setupPanel" class="panel"><h2 data-i18n="connectTitle">Connect to your Supabase project</h2><p class="secondary" data-i18n="connectExpl">Enter your project URL and its public publishable key. Never enter secret or service-role keys here.</p><form id="configForm"><label>Supabase project URL<input type="url" id="setupUrl" required placeholder="https://project.supabase.co" /></label><label>Public publishable key<input type="text" id="setupKey" required autocomplete="off" placeholder="sb_publishable_..." /></label><button type="submit" class="primary" data-i18n="connect">Connect</button></form><p class="status" id="configMessage"></p></section>
+   <section id="loginPanel" class="panel" hidden><h2 data-i18n="adminSignIn">Administrator sign in</h2><p data-i18n="signInDesc">Use your Supabase Authentication account.</p><form id="loginForm"><label><span data-i18n="email">Email</span><input type="email" id="loginEmail" required autocomplete="username" /></label><label><span data-i18n="password">Password</span><input type="password" id="loginPassword" required autocomplete="current-password" /></label><button class="primary" type="submit" id="loginButton" data-i18n="signIn">Sign in</button></form><p id="loginMessage" class="status"></p><button id="changeConnection" type="button" data-i18n="connection">Connection settings</button></section>
+   <section id="blockedPanel" class="panel" hidden><h2 data-i18n="accessCheck">Administrator access check</h2><p id="blockedText"></p><div class="formrow"><button id="retryAdmin" type="button" data-i18n="retry">Try again</button><button id="blockedSignout" type="button" data-i18n="signOut">Sign out</button></div></section>
+   <section id="adminData" hidden><div class="metrics"><div class="metric"><span data-i18n="schools">Schools</span><strong id="schoolMetric">—</strong></div><div class="metric"><span data-i18n="campuses">Campuses</span><strong id="campusMetric">—</strong></div><div class="metric"><span data-i18n="published">Published campuses</span><strong id="publishedMetric">—</strong></div></div><p class="status" id="adminMessage"></p><div class="management"><section class="panel"><div class="panelhead"><h2 data-i18n="manageSchools">Manage schools</h2><button id="addSchoolButton" type="button" class="primary" data-i18n="addSchool">+ Add school</button></div><div id="schoolManagement"></div></section><section class="panel"><div class="panelhead"><h2 data-i18n="manageCampuses">Manage campuses</h2><button id="addCampusButton" type="button" class="primary" data-i18n="addCampus">+ Add campus</button></div><div id="campusManagement"></div></section></div></section>
   </section>
-</main>
-<div class="overlay" id="modalOverlay" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="panelhead"><h2 id="modalTitle">School</h2><button id="closeModal" type="button" class="iconbutton" aria-label="Close">✕</button></div><div id="modalBody"></div></div></div>
-<footer><span>© SchoolsHub.ai</span><span data-i18n="footerText">A free directory of private schools in Pakistan</span></footer>
-<script src="config.js"></script><script src="app.js" defer></script>
+ </main>
+ <footer data-i18n="footerText">A free directory of private schools in Pakistan</footer>
+ <div class="modalOverlay" id="modalOverlay" hidden><section class="modal"><div class="modalheading"><h2 id="modalTitle">Add campus</h2><button type="button" id="closeModal" aria-label="Close dialog">✕</button></div><div id="modalBody"></div></section></div>
+ <script src="config.js"></script><script src="app.js" defer></script>
 </body>
 </html>
