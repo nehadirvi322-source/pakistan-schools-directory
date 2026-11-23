@@ -10,7 +10,7 @@ const dictionary = {
   directory:'اسکول تلاش کریں',admin:'سپر ایڈمن',freeTag:'مفت نجی اسکول ڈائریکٹری',heroTitle:'پاکستان میں اپنے بچوں کے لیے مناسب اسکول تلاش کریں۔',heroText:'صوبے، ضلع اور تحصیل کے مطابق نجی اسکول تلاش کریں اور اسکول کیمپس کا موازنہ کریں۔',wholePakistan:'پورا پاکستان',freeForever:'تلاش بالکل مفت',bilingual:'اردو اور انگریزی',schoolName:'اسکول کا نام',searchSchool:'اسکول تلاش کریں…',province:'صوبہ / علاقہ',district:'ضلع',tehsil:'تحصیل',country:'ملک',maps:'گوگل میپس کا مقام',allProvinces:'تمام صوبے',allDistricts:'تمام اضلاع',allTehsils:'تمام تحصیلیں',clearFilters:'فلٹر صاف کریں',explore:'نجی اسکول دریافت کریں',verifiedOnly:'صرف شائع شدہ کیمپس دکھائے جاتے ہیں',adminArea:'اسکول مینجمنٹ',adminDashboard:'سپر ایڈمن ڈیش بورڈ',adminIntro:'اپنے مجاز اکاؤنٹ سے اسکولوں اور کیمپس کا انتظام کریں۔',signOut:'لاگ آؤٹ',connectTitle:'Supabase پراجیکٹ سے منسلک کریں',connectExpl:'اپنا پراجیکٹ URL اور پبلش ایبل کی درج کریں۔ خفیہ کی ہرگز درج نہ کریں۔',connect:'منسلک کریں',adminSignIn:'ایڈمن سائن اِن',signInDesc:'اپنا SchoolsHub.ai Supabase اکاؤنٹ استعمال کریں۔',connection:'کنکشن سیٹنگز',email:'ای میل',password:'پاس ورڈ',signIn:'سائن اِن',schools:'اسکول',campuses:'کیمپس',published:'شائع شدہ کیمپس',manageSchools:'اسکول مینجمنٹ',manageCampuses:'کیمپس مینجمنٹ',addSchool:'+ اسکول شامل کریں',addCampus:'+ کیمپس شامل کریں',accessCheck:'ایڈمن رسائی کی جانچ',retry:'دوبارہ کوشش کریں',footerText:'پاکستان میں نجی اسکولوں کی مفت ڈائریکٹری',noResults:'کوئی شائع شدہ کیمپس نہیں ملا۔',noPublished:'ابھی کوئی شائع شدہ کیمپس موجود نہیں۔ آپ کا ٹیسٹ کیمپس عوام کو نظر نہیں آئے گا۔',connectPreview:'پیش نظارہ: اصل ریکارڈ دکھانے کے لیے Supabase سے منسلک کریں۔',demo:'صرف نمونہ — اصل پبلک ریکارڈ نہیں',recordLabel:'نجی اسکول',locationUnknown:'مقام دستیاب نہیں',count:'شائع شدہ کیمپس',save:'محفوظ کریں',cancel:'منسوخ کریں',nameEn:'اسکول کا نام (انگریزی)',nameUr:'اسکول کا نام (اردو)',website:'ویب سائٹ (اختیاری)',campusName:'کیمپس کا نام',chooseSchool:'اسکول منتخب کریں',chooseArea:'علاقہ منتخب کریں',createSchool:'اسکول بنائیں',editSchool:'اسکول تبدیل کریں',createCampus:'کیمپس بنائیں',publish:'شائع کریں',unpublish:'چھپائیں',edit:'تبدیل کریں',passwordError:'ای میل اور پاس ورڈ درج کریں۔',loginSuccess:'سائن اِن ہو گیا۔ ایڈمن اجازت چیک ہو رہی ہے…',schoolSaved:'اسکول محفوظ ہو گیا۔',campusSaved:'کیمپس محفوظ ہو گیا۔',campusUpdated:'کیمپس کی حیثیت اپ ڈیٹ ہو گئی۔',publishConfirm:'کیا آپ یہ کیمپس عوامی ڈائریکٹری پر شائع کرنا چاہتے ہیں؟',unpublishConfirm:'کیا آپ یہ کیمپس عوام سے چھپانا چاہتے ہیں؟',setupSaved:'کنکشن اس براؤزر میں محفوظ ہو گیا۔ اب ایڈمن کے طور پر سائن اِن کریں۔',unauthorized:'اس اکاؤنٹ کو ڈائریکٹری میں تبدیلی کی اجازت نہیں ہے۔',permissionError:'ایڈمن اجازت کی تصدیق نہیں ہو سکی۔ Supabase Data API میں is_super_admin فنکشن کو ایکسپوز کریں، RLS بند نہ کریں۔',loaded:'Supabase سے شائع شدہ کیمپس دکھائے جا رہے ہیں۔',manageHint:'کیمپس شائع کرنے سے پہلے اس کی تمام معلومات چیک کریں۔'
  }
 };
-const state = { lang: 'en', view:'directory', config: {}, userToken: null, publicCampuses:[], schools:[], campuses:[], areas:[], provinces:[], districts:[], cities:[], tehsils:[], locales:[], connected:false, isAdmin:false };
+const state = { lang: 'en', view:'directory', config: {}, userToken: null, publicCampuses:[], publicCatalog:{provinces:[],districts:[],tehsils:[]}, schools:[], campuses:[], areas:[], provinces:[], districts:[], cities:[], tehsils:[], locales:[], connected:false, isAdmin:false };
 const t = (key) => dictionary[state.lang][key] || dictionary.en[key] || key;
 const asString = (x) => String(x ?? '');
 function setStatus(id,text,kind='') { const el=$(id); el.textContent=text;el.className='status'+(kind?' '+kind:''); }
@@ -51,24 +51,67 @@ function normalizeCampus(row){
  const school=row.schools||{};
  return {id:row.id,schoolId:row.school_id,school:localizedName(school),englishName:school.name||'',urduName:school.name_ur||'',campus:row.campus_name||'',province:province.name||legacyProvince.name||'',district:district.name||legacyDistrict.name||'',tehsil:tehsil.name||'',legacyArea:legacyArea.name||'',legacyCity:legacyCity.name||'',google_maps_url:validatedMapsUrl(row.google_maps_url),website:school.website||'',is_published:row.is_published===true};
 }
+// Public location filters use the reference tables, not the published campus list.
+// This makes provinces/districts/tehsils available even when no campuses are published.
+async function loadPublicCatalogTable(table,columns){
+ const pageSize=500, all=[];
+ for(let offset=0;offset<20000;offset+=pageSize){
+  const page=await request('/rest/v1/'+table+'?select='+columns+'&order=name.asc&limit='+pageSize+'&offset='+offset);
+  if(!Array.isArray(page))throw Error('Unexpected response when reading '+table+'.');
+  all.push(...page);
+  if(page.length<pageSize)return all;
+ }
+ throw Error('Location list is unexpectedly large.');
+}
 async function loadPublic(){
- if(!validSetup()){state.connected=false;state.publicCampuses=[];state.locales=[];setStatus('publicNotice',t('connectPreview'));renderPublic();return;}
- setStatus('publicNotice',state.lang==='en'?'Loading published campuses…':'کیمپس لوڈ ہو رہے ہیں…');
- try{
-  const records=await request('/rest/v1/campuses?select=id,campus_name,school_id,is_published,google_maps_url,schools(name,name_ur,website),tehsils(name,districts(name,provinces(name))),areas(name,cities(name,districts(name,provinces(name))))&is_published=eq.true&limit=1000');
-  state.publicCampuses=(records||[]).map(normalizeCampus);
-  state.connected=true;populateFilters();setStatus('publicNotice',t('loaded'),'ok');renderPublic();
- }catch(error){state.connected=false;state.publicCampuses=[];setStatus('publicNotice','Unable to load published schools: '+friendlyError(error),'error');renderPublic()}
+ if(!validSetup()){
+  state.connected=false;state.publicCampuses=[];
+  state.publicCatalog={provinces:[],districts:[],tehsils:[]};
+  setStatus('publicNotice',t('connectPreview'));populateFilters();renderPublic();return;
+ }
+ setStatus('publicNotice',state.lang==='en'?'Loading school locations and published campuses…':'مقامات اور شائع شدہ کیمپس لوڈ ہو رہے ہیں…');
+ // Load published campuses and geographic reference data separately so one issue
+ // doesn't silently erase the other type of result.
+ const results=await Promise.allSettled([
+  request('/rest/v1/campuses?select=id,campus_name,school_id,is_published,google_maps_url,schools(name,name_ur,website),tehsils(name,districts(name,provinces(name))),areas(name,cities(name,districts(name,provinces(name))))&is_published=eq.true&limit=1000'),
+  loadPublicCatalogTable('provinces','id,name'),
+  loadPublicCatalogTable('districts','id,name,province_id'),
+  loadPublicCatalogTable('tehsils','id,name,district_id')
+ ]);
+ const messages=[];
+ if(results[0].status==='fulfilled'){
+  state.publicCampuses=(results[0].value||[]).map(normalizeCampus);
+ }else{
+  state.publicCampuses=[];
+  messages.push('Could not load published schools: '+friendlyError(results[0].reason));
+ }
+ const [provinces,districts,tehsils]=results.slice(1).map((result,i)=>{
+  if(result.status==='fulfilled')return result.value||[];
+  messages.push('Could not load '+['provinces','districts','tehsils'][i]+': '+friendlyError(result.reason));
+  return [];
+ });
+ state.publicCatalog={provinces,districts,tehsils};
+ if(!provinces.length){
+  messages.push('No public province records returned. Check the SELECT policy for provinces in Supabase; do not disable RLS.');
+ }
+ state.connected=results[0].status==='fulfilled';
+ populateFilters();
+ setStatus('publicNotice',messages.length?messages.join(' | '):t('loaded'),messages.length?'error':'ok');
+ renderPublic();
 }
 function unique(list){return [...new Set(list.filter(Boolean))].sort((a,b)=>a.localeCompare(b));}
 function populateSelect(el,items,label){const old=el.value;el.innerHTML='<option value="">'+escapeHTML(label)+'</option>'+items.map(value=>'<option value="'+escapeHTML(value)+'">'+escapeHTML(value)+'</option>').join('');if(items.includes(old))el.value=old;}
 function populateFilters(){
- const list=state.publicCampuses;
- populateSelect($('provinceFilter'),unique(list.map(x=>x.province)),t('allProvinces'));
- const p=$('provinceFilter').value;
- populateSelect($('districtFilter'),unique(list.filter(x=>!p||x.province===p).map(x=>x.district)),t('allDistricts'));
- const d=$('districtFilter').value;
- populateSelect($('tehsilFilter'),unique(list.filter(x=>(!p||x.province===p)&&(!d||x.district===d)).map(x=>x.tehsil)),t('allTehsils'));
+ const catalog=state.publicCatalog;
+ populateSelect($('provinceFilter'),unique(catalog.provinces.map(x=>x.name)),t('allProvinces'));
+ const selectedProvince=$('provinceFilter').value;
+ const provinceIds=new Set(catalog.provinces.filter(p=>!selectedProvince||p.name===selectedProvince).map(p=>p.id));
+ const possibleDistricts=catalog.districts.filter(d=>provinceIds.has(d.province_id));
+ populateSelect($('districtFilter'),unique(possibleDistricts.map(d=>d.name)),t('allDistricts'));
+ const selectedDistrict=$('districtFilter').value;
+ const districtIds=new Set(possibleDistricts.filter(d=>!selectedDistrict||d.name===selectedDistrict).map(d=>d.id));
+ const possibleTehsils=catalog.tehsils.filter(th=>districtIds.has(th.district_id));
+ populateSelect($('tehsilFilter'),unique(possibleTehsils.map(th=>th.name)),t('allTehsils'));
 }
 function renderPublic(){
  const cards=$('schoolCards');if(!cards)return;
@@ -191,7 +234,8 @@ async function signOut(){const token=state.userToken;state.userToken=null;state.
 // UI events
 $('homeLink').onclick=()=>switchView('directory');$('navDirectory').onclick=()=>switchView('directory');$('navAdmin').onclick=()=>switchView('admin');$('languageButton').onclick=()=>{state.lang=state.lang==='en'?'ur':'en';updateLabels();populateFilters()};
 $('nameFilter').oninput=renderPublic;
-['provinceFilter','districtFilter'].forEach(id=>$(id).onchange=()=>{populateFilters();renderPublic()});
+$('provinceFilter').onchange=()=>{$('districtFilter').value='';$('tehsilFilter').value='';populateFilters();renderPublic()};
+$('districtFilter').onchange=()=>{$('tehsilFilter').value='';populateFilters();renderPublic()};
 $('tehsilFilter').onchange=renderPublic;
 $('clearFilters').onclick=()=>{$('nameFilter').value='';$('provinceFilter').value='';$('districtFilter').value='';$('tehsilFilter').value='';populateFilters();renderPublic()};
 $('configForm').onsubmit=async (event)=>{event.preventDefault();state.config={supabaseUrl:$('setupUrl').value.trim().replace(/\/$/,''),publishableKey:$('setupKey').value.trim()};if(!validSetup()){setStatus('configMessage','Enter a valid https://project.supabase.co URL and an sb_publishable_ key.','error');return;}localWrite(state.config);setStatus('configMessage',t('setupSaved'),'ok');await loadPublic();$('setupPanel').hidden=true;$('loginPanel').hidden=false;};
