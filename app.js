@@ -48,8 +48,11 @@ function validatedMapsUrl(raw){
 function normalizeCampus(row){
  const legacyArea=row.areas||{},legacyCity=legacyArea.cities||{},legacyDistrict=legacyCity.districts||{},legacyProvince=legacyDistrict.provinces||{};
  const tehsil=row.tehsils||{},district=tehsil.districts||{},province=district.provinces||{};
+ // district_id is used for territory-level campuses where a tehsil is not required.
+ // Older campus records still fall back to their tehsil or legacy area location.
+ const directDistrict=row.districts||{},directProvince=directDistrict.provinces||{};
  const school=row.schools||{};
- return {id:row.id,schoolId:row.school_id,school:localizedName(school),englishName:school.name||'',urduName:school.name_ur||'',campus:row.campus_name||'',province:province.name||legacyProvince.name||'',district:district.name||legacyDistrict.name||'',tehsil:tehsil.name||'',legacyArea:legacyArea.name||'',legacyCity:legacyCity.name||'',google_maps_url:validatedMapsUrl(row.google_maps_url),website:school.website||'',is_published:row.is_published===true};
+ return {id:row.id,schoolId:row.school_id,school:localizedName(school),englishName:school.name||'',urduName:school.name_ur||'',campus:row.campus_name||'',province:province.name||directProvince.name||legacyProvince.name||'',district:district.name||directDistrict.name||legacyDistrict.name||'',tehsil:tehsil.name||'',legacyArea:legacyArea.name||'',legacyCity:legacyCity.name||'',google_maps_url:validatedMapsUrl(row.google_maps_url),website:school.website||'',is_published:row.is_published===true};
 }
 // Public location filters use the reference tables, not the published campus list.
 // This makes provinces/districts/tehsils available even when no campuses are published.
@@ -73,7 +76,7 @@ async function loadPublic(){
  // Load published campuses and geographic reference data separately so one issue
  // doesn't silently erase the other type of result.
  const results=await Promise.allSettled([
-  request('/rest/v1/campuses?select=id,campus_name,school_id,is_published,google_maps_url,schools(name,name_ur,website),tehsils(name,districts(name,provinces(name))),areas(name,cities(name,districts(name,provinces(name))))&is_published=eq.true&limit=1000'),
+  request('/rest/v1/campuses?select=id,campus_name,school_id,is_published,google_maps_url,schools(name,name_ur,website),districts(name,provinces(name)),tehsils(name,districts(name,provinces(name))),areas(name,cities(name,districts(name,provinces(name))))&is_published=eq.true&limit=1000'),
   loadPublicCatalogTable('provinces','id,name'),
   loadPublicCatalogTable('districts','id,name,province_id'),
   loadPublicCatalogTable('tehsils','id,name,district_id')
@@ -112,6 +115,11 @@ function populateFilters(){
  const districtIds=new Set(possibleDistricts.filter(d=>!selectedDistrict||d.name===selectedDistrict).map(d=>d.id));
  const possibleTehsils=catalog.tehsils.filter(th=>districtIds.has(th.district_id));
  populateSelect($('tehsilFilter'),unique(possibleTehsils.map(th=>th.name)),t('allTehsils'));
+ // In our directory, Islamabad is selected at district level, without a tehsil.
+ const territoryOnly=selectedProvince==='Islamabad Capital Territory';
+ const tehsilLabel=$('tehsilFilter').closest('label');
+ if(tehsilLabel)tehsilLabel.hidden=territoryOnly;
+ if(territoryOnly)$('tehsilFilter').value='';
 }
 function renderPublic(){
  const cards=$('schoolCards');if(!cards)return;
@@ -149,7 +157,7 @@ async function checkAdminAccess(){
 async function loadAdmin(){
  const [schools,campuses,areas,provinces,districts,tehsils]=await Promise.all([
   request('/rest/v1/schools?select=id,name,name_ur,website,school_type&order=name.asc&limit=500',{authenticated:true}),
-  request('/rest/v1/campuses?select=id,school_id,area_id,tehsil_id,google_maps_url,campus_name,is_published&order=created_at.desc&limit=500',{authenticated:true}),
+  request('/rest/v1/campuses?select=id,school_id,area_id,tehsil_id,district_id,google_maps_url,campus_name,is_published&order=created_at.desc&limit=500',{authenticated:true}),
   request('/rest/v1/areas?select=id,name,cities(id,name,districts(id,name,provinces(id,name)))&limit=1000',{authenticated:true}),
   request('/rest/v1/provinces?select=id,name&order=name.asc&limit=1000',{authenticated:true}),
   request('/rest/v1/districts?select=id,name,province_id&order=name.asc&limit=1000',{authenticated:true}),
@@ -170,8 +178,9 @@ function renderAdmin(){
  $('publishedMetric').textContent=state.campuses.filter(x=>x.is_published===true).length;
  $('schoolManagement').innerHTML=state.schools.length?state.schools.map(s=>'<div class="dataitem"><strong>'+escapeHTML(localizedName(s))+'</strong><p>'+escapeHTML(s.website||'')+'</p><div class="actions"><button class="actionbtn" type="button" data-action="edit-school" data-id="'+escapeHTML(s.id)+'">'+escapeHTML(t('edit'))+'</button></div></div>').join(''):'<div class="secondary">No schools yet.</div>';
  $('campusManagement').innerHTML=state.campuses.length?state.campuses.map(c=>{
-  const school=state.schools.find(s=>s.id===c.school_id),th=state.tehsils.find(t=>t.id===c.tehsil_id),legacy=state.areas.find(a=>a.id===c.area_id),district=state.districts.find(d=>d.id===th?.district_id),province=state.provinces.find(p=>p.id===district?.province_id);
-  const place=th?[th.name,district?.name,province?.name].filter(Boolean).join(' · '):legacy?[legacy.name,legacy.location].filter(Boolean).join(' · '):'Location not set';
+  const school=state.schools.find(s=>s.id===c.school_id),th=state.tehsils.find(t=>t.id===c.tehsil_id),legacy=state.areas.find(a=>a.id===c.area_id);
+  const district=state.districts.find(d=>d.id===(th?.district_id||c.district_id)),province=state.provinces.find(p=>p.id===district?.province_id);
+  const place=th?[th.name,district?.name,province?.name].filter(Boolean).join(' · '):district?[district.name,province?.name].filter(Boolean).join(' · '):legacy?[legacy.name,legacy.location].filter(Boolean).join(' · '):'Location not set';
   return '<div class="dataitem"><strong>'+escapeHTML(c.campus_name||'Main campus')+'</strong><p>'+escapeHTML(school?.name||'School')+' · '+escapeHTML(place)+'</p><span class="tag">'+(c.is_published?'Published':'Unpublished')+'</span><div class="actions"><button class="actionbtn '+(c.is_published?'warning':'')+'" type="button" data-action="toggle-campus" data-id="'+escapeHTML(c.id)+'">'+escapeHTML(c.is_published?t('unpublish'):t('publish'))+'</button></div></div>';
  }).join(''):'<div class="secondary">No campuses yet.</div>';
 }
@@ -188,7 +197,7 @@ function campusForm(){
   '<label><span>'+escapeHTML(t('country'))+'</span><input value="Pakistan" readonly /></label>'+
   '<label><span>'+escapeHTML(t('province'))+'</span><select id="campusProvince" required></select></label>'+
   '<label><span>'+escapeHTML(t('district'))+'</span><select id="campusDistrict" required disabled></select></label>'+
-  '<label><span>'+escapeHTML(t('tehsil'))+'</span><select id="campusTehsil" required disabled></select></label>'+
+  '<label id="campusTehsilField"><span>'+escapeHTML(t('tehsil'))+'</span><select id="campusTehsil" required disabled></select></label>'+
   '<label class="full"><span>'+escapeHTML(t('maps'))+'</span><input name="google_maps_url" type="url" required placeholder="https://maps.app.goo.gl/..." /></label>'+
   '<label class="full"><span>'+escapeHTML(t('campusName'))+'</span><input name="campus_name" maxlength="250" placeholder="Main Campus" required /></label>'+
   '<div class="full"><small id="campusLocationHint" class="secondary">'+escapeHTML(state.lang==='ur'?'ضلع منتخب کرنے کے بعد تحصیل منتخب کریں۔':'Select a district to see its tehsils. New campuses are unpublished until approved.')+'</small></div>'+
@@ -196,6 +205,13 @@ function campusForm(){
   '<div class="full status" id="campusFormStatus"></div></form>');
  $('cancelCampus').onclick=closeModal;
  const provinces=$('campusProvince'),districts=$('campusDistrict'),tehsils=$('campusTehsil');
+ const districtOnly=()=>state.provinces.some(p=>p.id===provinces.value&&p.name==='Islamabad Capital Territory');
+ const syncTehsilField=()=>{
+  const hide=districtOnly();
+  $('campusTehsilField').hidden=hide;
+  tehsils.required=!hide;
+  if(hide){tehsils.value='';tehsils.disabled=true;}
+ };
  const showChoices=(select,items,placeholder,enabled=true)=>{
   items=[...items].sort((a,b)=>a.name.localeCompare(b.name));
   select.innerHTML='<option value="">'+escapeHTML(placeholder)+'</option>'+items.map(item=>'<option value="'+escapeHTML(item.id)+'">'+escapeHTML(item.name)+'</option>').join('');
@@ -207,20 +223,31 @@ function campusForm(){
  provinces.onchange=()=>{
   showChoices(districts,state.districts.filter(d=>d.province_id===provinces.value),labels.district,!!provinces.value);
   showChoices(tehsils,[],labels.tehsil,false);
+  syncTehsilField();
+  $('campusLocationHint').textContent=districtOnly()
+   ?(state.lang==='ur'?'اسلام آباد کے لیے صرف ضلع منتخب کریں؛ تحصیل کی ضرورت نہیں۔':'For Islamabad, select the district; no tehsil is required.')
+   :(state.lang==='ur'?'ضلع منتخب کرنے کے بعد تحصیل منتخب کریں۔':'Select a district to see its tehsils.');
  };
  districts.onchange=()=>{
-  const available=state.tehsils.filter(th=>th.district_id===districts.value);
+  const available=districtOnly()?[]:state.tehsils.filter(th=>th.district_id===districts.value);
   showChoices(tehsils,available,labels.tehsil,!!districts.value);
-  $('campusLocationHint').textContent=available.length?available.length+' tehsil(s) available.':'No tehsils registered for this district yet. Add them in Supabase first.';
+  syncTehsilField();
+  $('campusLocationHint').textContent=districtOnly()
+   ?(state.lang==='ur'?'اسلام آباد: صرف ضلع منتخب کریں اور گوگل میپس کا مقام درج کریں۔':'Islamabad: district only. Add the Google Maps location below.')
+   :available.length?available.length+' tehsil(s) available.':'No tehsils registered for this district yet. Add them in Supabase first.';
  };
  $('campusEditForm').onsubmit=async(event)=>{
   event.preventDefault();
   const data=new FormData(event.currentTarget),mapUrl=validatedMapsUrl(data.get('google_maps_url'));
-  const payload={school_id:String(data.get('school_id')||''),tehsil_id:tehsils.value,google_maps_url:mapUrl,campus_name:String(data.get('campus_name')||'').trim(),is_published:false};
+  const territoryOnly=districtOnly();
+  const payload={school_id:String(data.get('school_id')||''),district_id:districts.value,tehsil_id:territoryOnly?null:(tehsils.value||null),google_maps_url:mapUrl,campus_name:String(data.get('campus_name')||'').trim(),is_published:false};
   try {
    if(!state.schools.some(s=>s.id===payload.school_id))throw Error('Choose a school.');
-   const th=state.tehsils.find(t=>t.id===payload.tehsil_id);
-   if(!th||th.district_id!==districts.value||!state.districts.some(d=>d.id===th.district_id&&d.province_id===provinces.value))throw Error('Select province, district and tehsil in order.');
+   if(!state.districts.some(d=>d.id===payload.district_id&&d.province_id===provinces.value))throw Error('Select a province and district.');
+   if(!territoryOnly){
+    const th=state.tehsils.find(t=>t.id===payload.tehsil_id);
+    if(!th||th.district_id!==districts.value)throw Error('Select a tehsil for this district.');
+   }
    if(!mapUrl)throw Error('Please paste a valid HTTPS Google Maps share link.');
    if(!payload.campus_name)throw Error('Enter a campus name.');
    await request('/rest/v1/campuses',{method:'POST',body:payload,authenticated:true,prefer:'return=minimal'});
