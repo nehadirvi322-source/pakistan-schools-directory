@@ -135,7 +135,8 @@ function renderPublic(){
   const place=[x.tehsil||x.legacyArea||x.legacyCity,x.district,x.province,'Pakistan'].filter(Boolean).join(' · ');
   const siteLink=x.website&&/^https?:\/\//i.test(x.website)?'<p class="small"><a rel="noopener noreferrer" target="_blank" href="'+escapeHTML(x.website)+'">School website</a></p>':'';
   const mapLink=x.google_maps_url?'<p><a class="maplink" rel="noopener noreferrer" target="_blank" href="'+escapeHTML(x.google_maps_url)+'">📍 View on Google Maps</a></p>':'';
-  return '<article class="schoolcard"><span class="tag">'+escapeHTML(t('recordLabel'))+'</span><h3>'+escapeHTML(x.school||x.englishName)+'</h3><p><strong>'+escapeHTML(x.campus||'Main campus')+'</strong></p><p>📍 '+escapeHTML(place)+'</p>'+mapLink+siteLink+'</article>';
+  const detailLink='<p><a class="actionbtn" href="profile.html?campus='+encodeURIComponent(x.id)+'&lang='+encodeURIComponent(state.lang)+'">'+escapeHTML(state.lang==='ur'?'مکمل اسکول پروفائل دیکھیں':'View full school profile')+'</a></p>';
+  return '<article class="schoolcard"><span class="tag">'+escapeHTML(t('recordLabel'))+'</span><h3>'+escapeHTML(x.school||x.englishName)+'</h3><p><strong>'+escapeHTML(x.campus||'Main campus')+'</strong></p><p>📍 '+escapeHTML(place)+'</p>'+detailLink+mapLink+siteLink+'</article>';
  }).join(''):'<div class="empty">'+escapeHTML(state.publicCampuses.length?t('noResults'):t('noPublished'))+'</div>';
 }
 function showAdminState(){const configured=validSetup();$('setupPanel').hidden=configured;$('loginPanel').hidden=!configured||!!state.userToken;$('adminData').hidden=!state.isAdmin;$('blockedPanel').hidden=true;$('adminSignOut').hidden=!state.userToken;if(!configured){$('setupUrl').value=state.config.supabaseUrl||'https://xmzrevedabfoehqrfi.supabase.co';$('setupKey').value=state.config.publishableKey||'';}else if(state.userToken&&!state.isAdmin){$('loginPanel').hidden=true;checkAdminAccess();}}
@@ -181,12 +182,49 @@ function renderAdmin(){
   const school=state.schools.find(s=>s.id===c.school_id),th=state.tehsils.find(t=>t.id===c.tehsil_id),legacy=state.areas.find(a=>a.id===c.area_id);
   const district=state.districts.find(d=>d.id===(th?.district_id||c.district_id)),province=state.provinces.find(p=>p.id===district?.province_id);
   const place=th?[th.name,district?.name,province?.name].filter(Boolean).join(' · '):district?[district.name,province?.name].filter(Boolean).join(' · '):legacy?[legacy.name,legacy.location].filter(Boolean).join(' · '):'Location not set';
-  return '<div class="dataitem"><strong>'+escapeHTML(c.campus_name||'Main campus')+'</strong><p>'+escapeHTML(school?.name||'School')+' · '+escapeHTML(place)+'</p><span class="tag">'+(c.is_published?'Published':'Unpublished')+'</span><div class="actions"><button class="actionbtn '+(c.is_published?'warning':'')+'" type="button" data-action="toggle-campus" data-id="'+escapeHTML(c.id)+'">'+escapeHTML(c.is_published?t('unpublish'):t('publish'))+'</button></div></div>';
+  return '<div class="dataitem"><strong>'+escapeHTML(c.campus_name||'Main campus')+'</strong><p>'+escapeHTML(school?.name||'School')+' · '+escapeHTML(place)+'</p><span class="tag">'+(c.is_published?'Published':'Unpublished')+'</span><div class="actions"><button class="actionbtn '+(c.is_published?'warning':'')+'" type="button" data-action="toggle-campus" data-id="'+escapeHTML(c.id)+'">'+escapeHTML(c.is_published?t('unpublish'):t('publish'))+'</button> <button class="actionbtn" type="button" data-action="edit-campus-profile" data-id="'+escapeHTML(c.id)+'">'+escapeHTML(state.lang==='ur'?'تفصیلی پروفائل':'Edit profile')+'</button></div></div>';
  }).join(''):'<div class="secondary">No campuses yet.</div>';
 }
 function showModal(title,body){$('modalTitle').textContent=title;$('modalBody').innerHTML=body;$('modalOverlay').hidden=false;}
 function closeModal(){$('modalOverlay').hidden=true;$('modalBody').innerHTML='';}
 function schoolForm(school){const edit=!!school;showModal(edit?t('editSchool'):t('createSchool'),'<form id="schoolEditForm" class="formgrid"><label><span>'+t('nameEn')+'</span><input name="name" maxlength="250" required value="'+escapeHTML(school?.name||'')+'" /></label><label><span>'+t('nameUr')+'</span><input name="name_ur" maxlength="250" value="'+escapeHTML(school?.name_ur||'')+'" /></label><label class="full"><span>'+t('website')+'</span><input name="website" type="url" placeholder="https://example.com" value="'+escapeHTML(school?.website||'')+'" /></label><div class="full formrow"><button class="primary" type="submit">'+t('save')+'</button><button class="outlined" id="cancelSchool" type="button">'+t('cancel')+'</button></div><div class="full status" id="schoolFormStatus"></div></form>');$('cancelSchool').onclick=closeModal;$('schoolEditForm').onsubmit=async (event)=>{event.preventDefault();const data=new FormData(event.currentTarget);const payload={name:String(data.get('name')||'').trim(),name_ur:String(data.get('name_ur')||'').trim()||null,website:String(data.get('website')||'').trim()||null};try {if(!payload.name)throw Error('School name is required.');await request('/rest/v1/schools'+(edit?'?id=eq.'+encodeURIComponent(school.id):''),{method:edit?'PATCH':'POST',body:edit?payload:{...payload,school_type:'private'},authenticated:true,prefer:'return=minimal'});closeModal();await loadAdmin();setStatus('adminMessage',t('schoolSaved'),'ok');}catch(error){setStatus('schoolFormStatus',friendlyError(error),'error')}};}
+async function campusProfileForm(campus){
+ if(!campus||!state.isAdmin)return;
+ const fields=[
+  ['introduction','Introduction',4],['vision','Vision',3],['mission','Mission',3],['goals','Goals',3],
+  ['curriculum','Curriculum / education system',2],['grades_offered','Grade levels',2],
+  ['instruction_languages','Languages of instruction',2],['accreditation','Accreditations (verified only)',2],
+  ['admissions_process','Admissions process',3],['tuition_fee','Tuition information (verified only)',2],
+  ['registration_fee','Registration fee (verified only)',2],['school_hours','School hours',2],
+  ['facilities','Facilities (one per line)',3],['transport_info','Transport',2],
+  ['extracurricular','Extracurricular activities',2],['street_address','Street address',2],
+  ['gallery_urls','Campus photo URLs (one HTTPS URL per line, with permission)',4],
+  ['events_text','Events',3],['faq_text','Frequently asked questions',4]
+ ];
+ let existing={};
+ try{
+  const rows=await request('/rest/v1/campus_profiles?select=*&campus_id=eq.'+encodeURIComponent(campus.id)+'&limit=1',{authenticated:true});
+  existing=Array.isArray(rows)?(rows[0]||{}):{};
+ }catch(error){setStatus('adminMessage','Profile details are not ready yet. First run the supplied Supabase migration. '+friendlyError(error),'error');return;}
+ const inputs=fields.map(([key,label,rows])=>'<label class="full"><span>'+escapeHTML(label)+'</span><textarea name="'+key+'" rows="'+rows+'" maxlength="10000" style="width:100%;resize:vertical;border:1px solid #cddde9;border-radius:10px;padding:12px;font:inherit;color:#163447">'+escapeHTML(existing[key]||'')+'</textarea></label>').join('');
+ showModal('Edit campus profile — '+campus.campus_name,
+ '<form class="formgrid" id="campusProfileEditForm"><p class="full secondary">Only verified information should be published. School phone numbers are never displayed on the public profile. Parent reviews will require separate moderation.</p>'+inputs+
+ '<div class="full formrow"><button class="primary" type="submit">Save profile details</button><button id="cancelCampusProfile" type="button">Cancel</button></div><div class="full status" id="campusProfileStatus"></div></form>');
+ $('cancelCampusProfile').onclick=closeModal;
+ $('campusProfileEditForm').onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.currentTarget;const data=new FormData(form);
+  const payload={campus_id:campus.id,updated_at:new Date().toISOString()};
+  fields.forEach(([key])=>{payload[key]=String(data.get(key)||'').trim()||null});
+  const urls=(payload.gallery_urls||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+  if(urls.some(x=>!/^https:\/\//i.test(x))){setStatus('campusProfileStatus','Use HTTPS links for campus photos.','error');return;}
+  try{
+   await request('/rest/v1/campus_profiles?on_conflict=campus_id',{method:'POST',body:payload,authenticated:true,prefer:'resolution=merge-duplicates,return=minimal'});
+   closeModal();setStatus('adminMessage','Campus profile saved. Only approved details appear on the public profile.','ok');
+  }catch(error){setStatus('campusProfileStatus','Could not save: '+friendlyError(error),'error');}
+ };
+}
+
 function campusForm(){
  if(!state.schools.length){setStatus('adminMessage','Add a school before creating a campus.','error');return;}
  const labels=state.lang==='ur'?{province:'صوبہ منتخب کریں',district:'ضلع منتخب کریں',tehsil:'تحصیل منتخب کریں'}:{province:'Choose a province',district:'Choose a district',tehsil:'Choose a tehsil'};
@@ -271,7 +309,7 @@ $('loginForm').onsubmit=async(event)=>{event.preventDefault();const email=$('log
 $('adminSignOut').onclick=signOut;$('blockedSignout').onclick=signOut;$('retryAdmin').onclick=checkAdminAccess;
 $('addSchoolButton').onclick=()=>schoolForm(null);$('addCampusButton').onclick=campusForm;
 $('schoolManagement').onclick=event=>{const button=event.target.closest('button[data-action]');if(button?.dataset.action==='edit-school'){const school=state.schools.find(s=>s.id===button.dataset.id);if(school)schoolForm(school)}};
-$('campusManagement').onclick=event=>{const button=event.target.closest('button[data-action]');if(button?.dataset.action==='toggle-campus')toggleCampus(button.dataset.id)};
+$('campusManagement').onclick=event=>{const button=event.target.closest('button[data-action]');if(!button)return;if(button.dataset.action==='toggle-campus')toggleCampus(button.dataset.id);else if(button.dataset.action==='edit-campus-profile'){const campus=state.campuses.find(c=>c.id===button.dataset.id);if(campus)campusProfileForm(campus);}};
 $('closeModal').onclick=closeModal;$('modalOverlay').onclick=event=>{if(event.target===$('modalOverlay'))closeModal()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalOverlay').hidden)closeModal()});
 
 state.config=currentConfig();updateLabels();$('setupUrl').value=state.config.supabaseUrl||'https://xmzrevedabfoehqrfi.supabase.co';$('setupKey').value=state.config.publishableKey||'';loadPublic();
