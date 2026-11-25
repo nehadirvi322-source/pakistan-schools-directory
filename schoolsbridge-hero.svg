@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 740 660" role="img" aria-labelledby="heroTitle heroDesc">
+<title id="heroTitle">A parent and child learning together</title><desc id="heroDesc">Original illustration of a parent and child exploring learning opportunities with a computer.</desc>
+<defs>
+ <linearGradient id="halo" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4ad7a9"/><stop offset="1" stop-color="#26baab"/></linearGradient>
+ <linearGradient id="desk" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#203c9d"/><stop offset="1" stop-color="#15245d"/></linearGradient>
+ <linearGradient id="veil" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#e2eafc"/></linearGradient>
+ <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#6b8cde"/><stop offset="1" stop-color="#3b57af"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#08165c" flood-opacity=".22"/></filter>
+</defs>
+<!-- Circles and education orbit -->
+<circle cx="392" cy="308" r="239" fill="url(#halo)" opacity=".96"/>
+<circle cx="392" cy="308" r="191" fill="#324bcd" opacity=".53"/>
+<circle cx="392" cy="308" r="158" fill="#3259c6" opacity=".32"/>
+<g stroke="#b1fff2" stroke-width="3" stroke-linecap="round" opacity=".72" fill="none"><path d="M128 199l-13-5m37-16-3-18m506 104 19-9m-8 27 18 6M175 447l-18 13"/><path d="M557 118l7-13 7 13 14 5-14 4-7 13-7-13-13-4z"/></g>
+<!-- Floating success mini-card -->
+<g filter="url(#shadow)"><rect x="506" y="140" width="184" height="97" rx="20" fill="white"/><rect x="530" y="164" width="47" height="47" rx="13" fill="#def6ed"/><path d="M543 187l8 8 14-17" stroke="#099b7c" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="590" y="166" width="71" height="9" rx="4.5" fill="#25469a"/><rect x="590" y="186" width="54" height="8" rx="4" fill="#b4c6e2"/><rect x="590" y="204" width="63" height="7" rx="3.5" fill="#d0daef"/></g>
+<!-- Child: hair, head, body -->
+<g><path d="M233 315c-15-54 14-106 70-115 53-7 83 36 76 93l-17 31-112 4z" fill="#1f3154"/>
+<path d="M233 332q6-52 60-59 56-2 72 51l-12 62-108 3z" fill="#edb185"/>
+<path d="M243 287c15 3 39 0 56-22 10 19 31 28 65 28-2-56-32-85-71-86-47-2-73 33-69 81z" fill="#253755"/>
+<path d="M269 334q7 8 14 0m47-2q7 9 14 0" stroke="#603d40" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M291 362q12 12 25 0" stroke="#a66c60" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M233 390q55-38 120 0l38 120-187 1z" fill="#f0f6ff"/>
+<path d="M272 382l28 29 27-29" stroke="#bed7f2" stroke-width="9" fill="none"/>
+<path d="M269 422q-32-6-53 35l24 26 44-44" fill="#ebac84"/>
+</g>
+<!-- Adult figure and headscarf -->
+<g><path d="M341 337q-19-148 100-172 115-1 124 130l-31 185-187-13z" fill="url(#veil)"/>
+<path d="M383 237q17-37 61-45 59 6 76 57-15-3-31-14-44 19-98 24z" fill="#e5edfd"/>
+<ellipse cx="440" cy="275" rx="70" ry="83" fill="#d8936c"/>
+<path d="M375 272q-7-63 53-80 51-15 93 42-54-5-77-27-29 39-69 42z" fill="#f6f8ff"/>
+<path d="M380 285q-24 58 15 93l20-21-18-91z" fill="#f8faff"/>
+<path d="M503 261q7 61-24 98l31 42q38-75-7-140z" fill="#edf3ff"/>
+<path d="M405 280q8 6 17 0m44 1q9 7 18-1" stroke="#503b3a" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M435 319q14 12 28-1" stroke="#a1534e" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M377 368q-63 15-72 112l14 115 251-9-19-124q-15-82-73-94l-42 30z" fill="url(#dress)"/>
+<path d="M376 369q52 56 118 7l-15 68q-51 25-106-10z" fill="#f7faff"/>
+<path d="M360 392q-11 42 16 59l41 20 47-21q-74-21-104-58z" fill="#edf4ff"/>
+</g>
+<!-- Laptop, anchored foreground -->
+<g filter="url(#shadow)"><path d="M232 432h318q12 0 9 13l-28 149H259z" fill="url(#desk)"/>
+<path d="M258 594h270l33 16q7 7-5 11H228q-12-4-5-11z" fill="#cbd5ef"/><path d="M248 610h303" stroke="#859dc6" stroke-width="5" stroke-linecap="round"/>
+<circle cx="397" cy="512" r="29" fill="#ffffff20"/><path d="M379 524q19-32 37 0m-40 3h42" stroke="#ccfff3" stroke-width="5" stroke-linecap="round" fill="none"/>
+</g>
+<!-- Decorative small icon -->
+<g filter="url(#shadow)"><rect x="115" y="337" width="115" height="108" rx="23" fill="#fff"/><path d="M141 373l32-13 32 13-32 13z" fill="#2849ba"/><path d="M154 385v15q18 17 37 0v-15" fill="#17a89b"/><path d="M205 373v25" stroke="#2849ba" stroke-width="5" stroke-linecap="round"/><circle cx="205" cy="402" r="5" fill="#ffd267"/></g>
+</svg>
