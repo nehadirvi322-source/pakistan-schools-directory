@@ -58,6 +58,7 @@ function initializeEnhancements(){
   document.head.appendChild(style);
  }
 }
+const IS_ADMIN_PAGE = /(?:^|\/)admin\.html$/i.test(window.location.pathname);
 const state = { lang: 'en', view:'directory', config: {}, userToken: null, publicCampuses:[], publicCatalog:{provinces:[],districts:[],tehsils:[]}, schools:[], campuses:[], areas:[], provinces:[], districts:[], cities:[], tehsils:[], locales:[], connected:false, isAdmin:false };
 const t = (key) => dictionary[state.lang][key] || dictionary.en[key] || key;
 const asString = (x) => String(x ?? '');
@@ -67,7 +68,7 @@ function localWrite(obj){try {localStorage.setItem('schoolshub_connection',JSON.
 function currentConfig(){const bundled=window.SCHOOLSHUB_CONFIG||{};const saved=localRead();return {supabaseUrl:saved.supabaseUrl||bundled.supabaseUrl||'',publishableKey:saved.publishableKey||bundled.publishableKey||''}}
 function validSetup(){return /^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(state.config.supabaseUrl||'') && /^sb_publishable_[a-zA-Z0-9_-]+$/.test(state.config.publishableKey||'')}
 function updateLabels(){document.documentElement.lang=state.lang;document.documentElement.dir=state.lang==='ur'?'rtl':'ltr';document.body.classList.toggle('rtl',state.lang==='ur');document.querySelectorAll('[data-i18n]').forEach(el=>{const value=el.getAttribute('data-i18n');if(dictionary[state.lang][value])el.textContent=t(value)});document.querySelectorAll('[data-ph]').forEach(el=>el.placeholder=t(el.dataset.ph));populateSchoolTypeFilter();$('languageButton').textContent=state.lang==='en'?'اردو':'English';renderPublic();if(state.isAdmin)renderAdmin();}
-function switchView(view){state.view=view;$('directoryView').hidden=view!=='directory';$('adminView').hidden=view!=='admin';$('navDirectory').classList.toggle('active',view==='directory');$('navAdmin').classList.toggle('active',view==='admin');if($('schoolsbridgeWhatsapp'))$('schoolsbridgeWhatsapp').hidden=view!=='directory';window.scrollTo(0,0);if(view==='admin')showAdminState();}
+function switchView(view){if(view==='admin'&&!IS_ADMIN_PAGE){window.location.assign('admin.html');return;}if(view==='directory'&&IS_ADMIN_PAGE){window.location.assign('./');return;}state.view=view;$('directoryView').hidden=view!=='directory';$('adminView').hidden=view!=='admin';$('navDirectory').classList.toggle('active',view==='directory');$('navAdmin').classList.toggle('active',view==='admin');if($('schoolsbridgeWhatsapp'))$('schoolsbridgeWhatsapp').hidden=view!=='directory';window.scrollTo(0,0);if(view==='admin')showAdminState();}
 async function request(path,{method='GET',body,authenticated=false,prefer}={}){
  if(!validSetup())throw Error('Project URL or publishable key missing.');
  const headers={apikey:state.config.publishableKey};
@@ -369,4 +370,4 @@ $('schoolManagement').onclick=event=>{const button=event.target.closest('button[
 $('campusManagement').onclick=event=>{const button=event.target.closest('button[data-action]');if(!button)return;if(button.dataset.action==='toggle-campus')toggleCampus(button.dataset.id);else if(button.dataset.action==='edit-campus-profile'){const campus=state.campuses.find(c=>c.id===button.dataset.id);if(campus)campusProfileForm(campus);}};
 $('closeModal').onclick=closeModal;$('modalOverlay').onclick=event=>{if(event.target===$('modalOverlay'))closeModal()};document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modalOverlay').hidden)closeModal()});
 
-initializeEnhancements();state.config=currentConfig();updateLabels();$('setupUrl').value=state.config.supabaseUrl||'https://xmzrevedabfoehqrfi.supabase.co';$('setupKey').value=state.config.publishableKey||'';loadPublic();
+initializeEnhancements();state.config=currentConfig();updateLabels();$('setupUrl').value=state.config.supabaseUrl||'https://xmzrevedabfoehqrfi.supabase.co';$('setupKey').value=state.config.publishableKey||'';if(IS_ADMIN_PAGE){switchView('admin');}else{loadPublic();}
