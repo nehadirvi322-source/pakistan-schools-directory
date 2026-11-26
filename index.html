@@ -31,7 +31,90 @@ body.rtl .hero-copy,body.rtl .searchbox,body.rtl .value-props{text-align:right}b
 @media(max-width:640px){main{padding:0 14px 45px}.topbar{padding:14px}.brand{font-size:21px;gap:8px}.brand-icon{width:43px;height:43px;border-radius:12px}.topbar nav{width:100%;justify-content:space-between}.topbar nav button{font-size:12px;padding:9px 12px}.hero{margin:0 -14px;border-radius:0 0 23px 23px;padding:35px 22px 90px;min-height:0}.hero-layout{grid-template-columns:1fr}.hero h1{font-size:clamp(36px,9.3vw,50px);max-width:550px}.hero-copy>p:not(.eyebrow){font-size:15px;line-height:1.7}.hero-visual{min-height:0;max-height:240px;overflow:hidden}.hero-visual img{width:70%;max-width:290px;margin:-35px auto -100px}.chips span{font-size:11px;padding:7px 9px}.searchbox{margin:-54px 0 34px;padding:20px 16px;box-shadow:0 12px 30px #19388624}.searchbox-head{margin-bottom:15px}.searchgrid{grid-template-columns:1fr 1fr;gap:10px}.searchgrid>label:first-child{grid-column:1/-1}.searchgrid label{font-size:12px}.searchgrid input,.searchgrid select{padding:10px;font-size:13px;height:45px}.value-props{gap:12px}.headline h2{font-size:25px}.metrics,.formgrid{grid-template-columns:1fr}.formgrid .full{grid-column:auto}#adminView h1{font-size:30px}}
 @media(max-width:380px){.searchgrid{grid-template-columns:1fr}.searchgrid>label:first-child{grid-column:auto}.brand{font-size:19px}.hero h1{font-size:36px}}
 
- </style>
+ 
+/* Teal homepage refresh — public presentation only; all app.js integration IDs stay intact. */
+:root{--deep:#053c51;--royal:#04778c;--royal2:#08ab93;--aqua:#5cf2b4;--teal:#079981;--ink:#142b45;--muted:#577184;--line:#d9e9ed;--surface:#f2f9fa}
+body:not(.admin-page){background:#f2f9fa}
+header{background:linear-gradient(105deg,#006778 0%,#008c8b 66%,#0ab78b 100%);border-bottom:1px solid #ffffff1c}
+.topbar{max-width:1370px;padding:18px 28px}
+.brand{font-size:26px}.brand-icon{width:56px;height:56px;background:#ffffffed}
+.brand-dot{color:#82ffba}.brand-bridge{color:#f0fff9}
+.topbar nav{gap:11px}.topbar nav button,.topbar nav .nav-guide{border:1px solid #ffffff70;background:#ffffff18;border-radius:12px;padding:12px 18px;text-decoration:none;color:white;font-size:14px;font-weight:760;line-height:1.2}
+.topbar nav .nav-guide:hover,.topbar nav .nav-guide:focus-visible{background:#ffffff35}
+#languageButton{margin-left:0;background:#ffffff14}
+main{max-width:1370px}
+.hero{background:
+ radial-gradient(circle at 87% 16%,#29d766a3 0%,transparent 42%),
+ radial-gradient(circle at 69% 98%,#2fffd68a 0%,transparent 43%),
+ linear-gradient(112deg,#005b70 0%,#008989 45%,#00ad97 71%,#16be6c 100%);
+ border-radius:0 0 28px 28px;min-height:535px;padding:60px max(28px,calc((100vw - 1370px) / 2 + 28px)) 119px}
+.hero:before{border:0;right:-100px;bottom:-385px;width:780px;height:780px;box-shadow:0 0 0 70px #1bfeb918,0 0 0 155px #d1ffbe14;z-index:-1}
+.hero:after{background:#5dffd615}
+.hero-layout{max-width:1314px;grid-template-columns:minmax(0,1.08fr) minmax(470px,1fr);gap:0}
+.hero-copy{position:relative;z-index:2;padding:10px 0 0}
+.hero .eyebrow{font-size:13px;letter-spacing:.19em;margin-bottom:24px;color:#9cffc7}
+.hero h1{font-size:clamp(43px,4.6vw,68px);max-width:750px;margin:0 0 24px;line-height:1.12;letter-spacing:-.049em;text-wrap:balance}
+.hero h1 strong{color:#81ff97}
+.hero-copy>p.hero-description{max-width:660px;font-size:18px;line-height:1.7;margin-bottom:28px}
+.chips span{background:#ffffff13;border-color:#ffffff8c;padding:10px 14px}
+.hero-visual{align-self:stretch;justify-content:end;min-height:375px;overflow:visible;position:relative;z-index:1}
+.hero-visual img{display:block;width:min(100%,730px);max-width:none;object-fit:contain;filter:none;margin:13px -65px -35px -15px}
+.hero-visual-bubble{display:none}
+.searchbox{margin:-82px 0 48px;z-index:7;padding:20px;border-radius:19px;box-shadow:0 18px 45px #075d6550}
+.searchbox-head{display:none}
+.searchgrid{display:grid;grid-template-columns:minmax(205px,1.65fr) repeat(4,minmax(112px,1fr)) minmax(128px,.72fr);gap:9px;align-items:end}
+.searchgrid label{min-width:0;gap:7px;border-right:1px solid #dfedf0;padding:0 9px 0 3px;font-size:12px}
+.searchgrid label:nth-of-type(5){border-right:0}
+.searchgrid input,.searchgrid select{border:0;padding:10px 6px;height:40px;background:#fff;font-weight:590;box-shadow:none}
+.searchgrid input:focus,.searchgrid select:focus{box-shadow:0 2px 0 #04ae87;border-radius:0}
+.search-submit{border:0!important;height:57px;border-radius:12px!important;background:linear-gradient(135deg,#11b989,#06986e)!important;color:white!important;font-size:16px;font-weight:790;box-shadow:0 6px 18px #049b7340;display:flex;align-items:center;justify-content:center;gap:8px}
+.search-submit:hover{background:linear-gradient(135deg,#06986e,#037b62)!important}
+.searchbox .toolbar{margin:8px 0 -8px;justify-content:end}
+.searchbox .toolbar button{background:transparent;border:0;color:#547c85;font-size:12px;padding:7px 5px}
+.listings-section{scroll-margin-top:24px}.listings-section .headline h2{font-size:32px}
+#whySchoolsBridge{scroll-margin-top:30px}
+body.rtl .hero-visual img{transform:scaleX(-1)}
+@media(max-width:1220px){
+ .hero-layout{grid-template-columns:minmax(0,1.1fr) minmax(350px,.84fr)}
+ .hero h1{font-size:clamp(37px,4.6vw,56px)}
+ .hero-visual img{width:calc(100% + 80px);margin-right:-50px}
+ .searchgrid{grid-template-columns:minmax(170px,1.45fr) repeat(4,minmax(100px,1fr)) 105px;gap:4px}
+ .searchbox{padding:15px}.searchgrid label{padding-right:3px}.search-submit{font-size:13px}
+}
+@media(max-width:980px){
+ .hero{padding:42px 24px 117px}
+ .hero-layout{grid-template-columns:1.05fr .85fr;gap:0}
+ .hero-visual{min-height:330px;align-items:end}.hero-visual img{width:115%;margin:0 -35px 3px -5px}
+ .searchgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+ .searchgrid>label:first-child{grid-column:span 2}
+ .search-submit{grid-column:span 1;height:52px}
+ .searchgrid label{border:0;border-bottom:1px solid #e6eff1}
+ .searchbox{margin-top:-66px}
+}
+@media(max-width:650px){
+ .topbar{padding:13px 15px;gap:8px}
+ .brand{font-size:19px}.brand-icon{width:44px;height:44px}
+ .topbar nav{width:auto;gap:5px}.topbar nav .nav-guide{display:none}.topbar nav button{font-size:12px;padding:9px 10px}
+ .hero{margin:0 -14px;padding:32px 21px 90px;border-radius:0 0 22px 22px;min-height:0}
+ .hero-layout{grid-template-columns:1fr}
+ .hero h1{font-size:clamp(37px,8.5vw,54px);max-width:580px}
+ .hero-copy>p.hero-description{font-size:15px;line-height:1.55}
+ .hero .eyebrow{font-size:10px;letter-spacing:.14em;margin-bottom:16px}
+ .hero-visual{max-height:290px;min-height:248px;overflow:hidden;justify-content:center}
+ .hero-visual img{width:min(520px,115%);max-width:none;margin:0 auto -25px;object-fit:contain}
+ .searchbox{margin:-55px 0 35px;padding:17px 15px}
+ .searchgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .searchgrid>label:first-child{grid-column:1/-1}
+ .searchgrid label{padding:0 3px 6px;font-size:11px}
+ .searchgrid input,.searchgrid select{height:35px;font-size:13px;padding:5px 3px}
+ .search-submit{grid-column:1/-1;height:49px;font-size:15px}
+ .chips{gap:7px}.chips span{font-size:11px;padding:7px 9px}
+ .listings-section .headline h2{font-size:25px}
+ #schoolsbridgeWhatsapp.sb-whatsapp-float{right:12px;bottom:13px;padding:11px!important;gap:0}#schoolsbridgeWhatsapp [data-i18n="chatWhatsapp"]{display:none!important}
+}
+@media(max-width:390px){.topbar nav .nav-guide{display:none}.brand{font-size:17px}.brand-icon{width:36px;height:36px}.hero h1{font-size:36px}}
+
+</style>
 </head>
 <body>
  <header><div class="topbar"><a class="brand" href="#" id="homeLink" aria-label="SchoolsBridge.ai home"><span class="brand-icon"><img src="schoolsbridge-mark.png" alt="" width="46" height="46"></span><span class="brand-light">Schools<span class="brand-bridge">Bridge</span><span class="brand-dot">.ai</span></span></a><nav aria-label="Main navigation"><button id="navDirectory" class="active" type="button" data-i18n="directory">Find Schools</button><button id="navAdmin" type="button" hidden aria-hidden="true" tabindex="-1" data-i18n="admin">Super Admin</button><button id="languageButton" type="button" aria-label="Switch language">اردو</button></nav></div></header>
@@ -41,20 +124,20 @@ body.rtl .hero-copy,body.rtl .searchbox,body.rtl .value-props{text-align:right}b
     <div class="hero-layout">
      <div class="hero-copy">
       <p class="eyebrow" data-i18n="freeTag">FREE PRIVATE SCHOOL DIRECTORY</p>
-      <h1 id="mainHeading" data-i18n="heroTitle">Find the right school in Pakistan.</h1>
-      <p data-i18n="heroText">Explore private schools by province, district and tehsil. Compare campuses, then choose with confidence.</p>
+      <h1 id="mainHeading"><span class="home-en">Find the best school for your child in <strong>Pakistan.</strong></span><span class="home-ur">پاکستان میں اپنے بچوں کے لیے بہترین اسکول تلاش کریں۔</span></h1>
+      <p class="hero-description"><span class="home-en">Explore private schools by province, district and tehsil. Discover school profiles and choose with confidence.</span><span class="home-ur">صوبے، ضلع اور تحصیل کے مطابق نجی اسکول تلاش کریں، ان کی معلومات دیکھیں اور اعتماد سے فیصلہ کریں۔</span></p>
       <div class="chips"><span data-i18n="wholePakistan">All Pakistan</span><span data-i18n="freeForever">Free to search</span><span data-i18n="bilingual">English &amp; Urdu</span></div>
      </div>
-     <div class="hero-visual" aria-hidden="true"><img src="schoolsbridge-hero.svg" alt="" width="740" height="660"><div class="hero-visual-bubble"><span>✓</span><span class="home-en">Explore with confidence</span><span class="home-ur">اطمینان سے تلاش کریں</span></div></div>
+     <div class="hero-visual" aria-hidden="true"><img src="schoolsbridge-family.webp" alt="" width="720" height="414" decoding="async" fetchpriority="high"></div>
     </div>
    </section>
    <section class="searchbox" aria-label="Find schools filters">
     <div class="searchbox-head"><h2 class="home-en">Explore schools in Pakistan</h2><h2 class="home-ur">پاکستان میں اسکول تلاش کریں</h2><p class="home-en">Start your search by school name or location</p><p class="home-ur">اسکول کے نام یا مقام سے تلاش شروع کریں</p></div>
-    <div class="searchgrid"><label><span data-i18n="searchSchool">Search schools…</span><input id="nameFilter" data-ph="searchSchool" placeholder="Search schools…" autocomplete="off" /></label><label><span data-i18n="province">Province / territory</span><select id="provinceFilter"><option>All provinces</option></select></label><label><span data-i18n="district">District</span><select id="districtFilter"><option>All districts</option></select></label><label><span data-i18n="tehsil">Tehsil</span><select id="tehsilFilter"><option>All tehsils</option></select></label></div>
+    <div class="searchgrid"><label><span data-i18n="searchSchool">Search schools…</span><input id="nameFilter" data-ph="searchSchool" placeholder="Search schools…" autocomplete="off" /></label><label><span data-i18n="province">Province / territory</span><select id="provinceFilter"><option>All provinces</option></select></label><label><span data-i18n="district">District</span><select id="districtFilter"><option>All districts</option></select></label><label><span data-i18n="tehsil">Tehsil</span><select id="tehsilFilter"><option>All tehsils</option></select></label><button class="search-submit" id="searchSchoolsButton" type="button"><svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.4-4.4"/></svg><span class="home-en">Search</span><span class="home-ur">تلاش کریں</span></button></div>
     <div class="toolbar"><button id="clearFilters" type="button" data-i18n="clearFilters">Clear filters</button></div>
    </section>
-   <section class="listings-section"><div class="headline"><h2 data-i18n="explore">Explore private schools</h2><span class="secondary" id="searchCount"></span></div><p class="status" id="publicNotice"></p><div id="schoolCards" class="cards"></div></section>
-   <section class="value-props" aria-label="Why use SchoolsBridge.ai">
+   <section class="listings-section" id="schoolResults"><div class="headline"><h2 data-i18n="explore">Explore private schools</h2><span class="secondary" id="searchCount"></span></div><p class="status" id="publicNotice"></p><div id="schoolCards" class="cards"></div></section>
+   <section class="value-props" id="whySchoolsBridge" aria-label="Why use SchoolsBridge.ai">
     <div class="value-card"><span class="value-icon" aria-hidden="true">⌕</span><h3><span class="home-en">Discover schools</span><span class="home-ur">اسکول دریافت کریں</span></h3><p><span class="home-en">Search private school campuses by province, district and tehsil, all in one place.</span><span class="home-ur">پاکستان بھر میں نجی اسکولوں کو صوبے، ضلع اور تحصیل کے مطابق تلاش کریں۔</span></p></div>
     <div class="value-card"><span class="value-icon" aria-hidden="true">⌂</span><h3><span class="home-en">Explore campuses</span><span class="home-ur">کیمپس کی معلومات دیکھیں</span></h3><p><span class="home-en">See published campus profiles and location information before making your choice.</span><span class="home-ur">شائع شدہ کیمپس کی معلومات اور مقام دیکھ کر بہتر فیصلہ کریں۔</span></p></div>
     <div class="value-card"><span class="value-icon" aria-hidden="true">♡</span><h3><span class="home-en">Ask for guidance</span><span class="home-ur">رہنمائی حاصل کریں</span></h3><p><span class="home-en">Have a question? Contact SchoolsBridge.ai on WhatsApp about schools in Pakistan.</span><span class="home-ur">کسی اسکول کے بارے میں سوال ہو تو SchoolsBridge.ai سے واٹس ایپ پر رابطہ کریں۔</span></p></div>
@@ -70,5 +153,11 @@ body.rtl .hero-copy,body.rtl .searchbox,body.rtl .value-props{text-align:right}b
  <footer data-i18n="footerText">A free directory of private schools in Pakistan</footer>
  <div class="modalOverlay" id="modalOverlay" hidden><section class="modal"><div class="modalheading"><h2 id="modalTitle">Add campus</h2><button type="button" id="closeModal" aria-label="Close dialog">✕</button></div><div id="modalBody"></div></section></div>
  <script src="config.js"></script><script src="app.js" defer></script>
+ <script>
+ document.addEventListener('DOMContentLoaded', function () {
+   const button=document.getElementById('searchSchoolsButton');
+   if(button)button.addEventListener('click',function(){document.getElementById('schoolResults').scrollIntoView({behavior:'smooth',block:'start'});});
+ });
+ </script>
 </body>
 </html>
