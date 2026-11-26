@@ -154,22 +154,33 @@ async function loadPublic(){
 function unique(list){return [...new Set(list.filter(Boolean))].sort((a,b)=>a.localeCompare(b));}
 function populateSelect(el,items,label){const old=el.value;el.innerHTML='<option value="">'+escapeHTML(label)+'</option>'+items.map(value=>'<option value="'+escapeHTML(value)+'">'+escapeHTML(value)+'</option>').join('');if(items.includes(old))el.value=old;}
 function populateFilters(){
+ // Cascade strictly from province -> district -> tehsil.
+ // No district options until a province is selected, and no tehsil options
+ // until a district within that province is selected.
  const catalog=state.publicCatalog;
- populateSelect($('provinceFilter'),unique(catalog.provinces.map(x=>x.name)),t('allProvinces'));
- const selectedProvince=$('provinceFilter').value;
- const provinceIds=new Set(catalog.provinces.filter(p=>!selectedProvince||p.name===selectedProvince).map(p=>p.id));
- const possibleDistricts=catalog.districts.filter(d=>provinceIds.has(d.province_id));
- populateSelect($('districtFilter'),unique(possibleDistricts.map(d=>d.name)),t('allDistricts'));
- const selectedDistrict=$('districtFilter').value;
- const districtIds=new Set(possibleDistricts.filter(d=>!selectedDistrict||d.name===selectedDistrict).map(d=>d.id));
- const possibleTehsils=catalog.tehsils.filter(th=>districtIds.has(th.district_id));
- populateSelect($('tehsilFilter'),unique(possibleTehsils.map(th=>th.name)),t('allTehsils'));
- // In our directory, Islamabad is selected at district level, without a tehsil.
+ const provinceSelect=$('provinceFilter'),districtSelect=$('districtFilter'),tehsilSelect=$('tehsilFilter');
+ populateSelect(provinceSelect,unique(catalog.provinces.map(p=>p.name)),t('allProvinces'));
+ const selectedProvince=provinceSelect.value;
+ const provinceIds=new Set(catalog.provinces.filter(p=>p.name===selectedProvince).map(p=>p.id));
+ const matchingDistricts=selectedProvince?catalog.districts.filter(d=>provinceIds.has(d.province_id)):[];
+ populateSelect(districtSelect,unique(matchingDistricts.map(d=>d.name)),
+  selectedProvince?t('allDistricts'):(state.lang==='ur'?'پہلے صوبہ منتخب کریں':'Select a province first'));
+ districtSelect.disabled=!selectedProvince||matchingDistricts.length===0;
+ if(districtSelect.disabled)districtSelect.value='';
+
+ const selectedDistrict=districtSelect.disabled?'':districtSelect.value;
+ const districtIds=new Set(matchingDistricts.filter(d=>d.name===selectedDistrict).map(d=>d.id));
+ const matchingTehsils=selectedDistrict?catalog.tehsils.filter(th=>districtIds.has(th.district_id)):[];
+ populateSelect(tehsilSelect,unique(matchingTehsils.map(th=>th.name)),
+  selectedDistrict?t('allTehsils'):(state.lang==='ur'?'پہلے ضلع منتخب کریں':'Select a district first'));
+ // Islamabad Capital Territory is selected at district level in this directory.
  const territoryOnly=selectedProvince==='Islamabad Capital Territory';
- const tehsilLabel=$('tehsilFilter').closest('label');
+ const tehsilLabel=tehsilSelect.closest('label');
  if(tehsilLabel)tehsilLabel.hidden=territoryOnly;
- if(territoryOnly)$('tehsilFilter').value='';
+ tehsilSelect.disabled=territoryOnly||!selectedDistrict||matchingTehsils.length===0;
+ if(tehsilSelect.disabled)tehsilSelect.value='';
 }
+
 function renderPublic(){
  const cards=$('schoolCards');if(!cards)return;
  if(!validSetup()){
