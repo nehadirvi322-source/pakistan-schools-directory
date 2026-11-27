@@ -81,6 +81,51 @@ async function request(path,{method='GET',body,authenticated=false,prefer}={}){
  if(!result.ok){const message=value && typeof value==='object'?(value.message||value.msg||value.error_description||value.error||JSON.stringify(value)):String(value);const error=Error(message||'HTTP '+result.status);error.status=result.status;throw error;}
  return value;
 }
+async function uploadCampusPhoto(campusId, file) {
+  if (!state.isAdmin || !state.userToken) {
+    throw new Error('Administrator sign-in required.');
+  }
+
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error('Please choose a JPG, PNG or WebP image.');
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error('Photo must be smaller than 5 MB.');
+  }
+
+  const extension = {
+    'image/jpeg': 'jpg',
+    'image/png': 'png',
+    'image/webp': 'webp'
+  }[file.type];
+
+  const path = `campuses/${campusId}/${crypto.randomUUID()}.${extension}`;
+
+  const baseUrl = state.config.supabaseUrl.replace(/\/$/, '');
+
+  const response = await fetch(
+    `${baseUrl}/storage/v1/object/school-photos/${path}`,
+    {
+      method: 'POST',
+      headers: {
+        apikey: state.config.publishableKey,
+        Authorization: `Bearer ${state.userToken}`,
+        'Content-Type': file.type,
+        'x-upsert': 'false'
+      },
+      body: file
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Photo upload failed: ' + await response.text());
+  }
+
+  return `${baseUrl}/storage/v1/object/public/school-photos/${path}`;
+}
 function friendlyError(error){return (error?.message||String(error||'Unknown error')).slice(0,350)}
 function localizedName(item,nameKey='name',urKey='name_ur'){return state.lang==='ur'&&item?.[urKey]?item[urKey]:item?.[nameKey]||''}
 function validatedMapsUrl(raw){
@@ -260,7 +305,7 @@ async function campusProfileForm(campus){
   ['facilities','Facilities (one per line)',3],['transport_info','Transport',2],
   ['extracurricular','Extracurricular activities',2],['street_address','Street address',2],
   ['gallery_urls','Campus photo URLs (one HTTPS URL per line, with permission)',4],
-  ['events_text','Events',3],['faq_text','Frequently asked questions',4]
+ ['events_text','Events',3]
  ];
  let existing={};
  try{
@@ -268,10 +313,79 @@ async function campusProfileForm(campus){
   existing=Array.isArray(rows)?(rows[0]||{}):{};
  }catch(error){setStatus('adminMessage','Profile details are not ready yet. First run the supplied Supabase migration. '+friendlyError(error),'error');return;}
  const inputs=fields.map(([key,label,rows])=>'<label class="full"><span>'+escapeHTML(label)+'</span><textarea name="'+key+'" rows="'+rows+'" maxlength="10000" style="width:100%;resize:vertical;border:1px solid #cddde9;border-radius:10px;padding:12px;font:inherit;color:#163447">'+escapeHTML(existing[key]||'')+'</textarea></label>').join('');
+ const faqEditor = '<div class="full"><h3>Frequently Asked Questions</h3><div id="faqItems"></div><button type="button" id="addFaqItem">+ Add Question</button></div>';
+ const photoEditor = `
+  <div class="full">
+    <h3>Campus Photos</h3>
+    <p>Select photos directly from your computer (JPG, PNG or WebP, maximum 5 MB each).</p>
+    <div id="campusPhotoItems"></div>
+    <button type="button" id="addCampusPhoto">
+      + Add Photo
+    </button>
+  </div>
+`;
  showModal('Edit campus profile — '+campus.campus_name,
- '<form class="formgrid" id="campusProfileEditForm"><p class="full secondary">Only verified information should be published. School phone numbers are never displayed on the public profile. Parent reviews will require separate moderation.</p><label class="full"><span>'+escapeHTML(t('schoolType'))+'</span><select name="school_type">'+schoolTypeOptions(campus.school_type||'')+'</select></label>'+inputs+
+ '<form class="formgrid" id="campusProfileEditForm"><p class="full secondary">Only verified information should be published. School phone numbers are never displayed on the public profile. Parent reviews will require separate moderation.</p><label class="full"><span>'+escapeHTML(t('schoolType'))+'</span><select name="school_type">'+schoolTypeOptions(campus.school_type||'')+'</select></label>'+inputs+photoEditor+faqEditor+
  '<div class="full formrow"><button class="primary" type="submit">Save profile details</button><button id="cancelCampusProfile" type="button">Cancel</button></div><div class="full status" id="campusProfileStatus"></div></form>');
  $('cancelCampusProfile').onclick=closeModal;
+ $('addCampusPhoto').onclick = () => {
+  const box = document.createElement('div');
+  box.className = 'campus-photo-item';
+  box.style.cssText = 'border:1px solid #cddde9;border-radius:12px;padding:16px;margin:12px 0;';
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/jpeg,image/png,image/webp';
+  input.className = 'campus-photo-file';
+
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.textContent = 'Remove Photo';
+  remove.onclick = () => box.remove();
+
+  box.appendChild(input);
+  box.appendChild(remove);
+  $('campusPhotoItems').appendChild(box);
+};
+ $('addFaqItem').onclick = () => {
+  const box = document.createElement('div');
+  box.className = 'faq-item';
+  box.style.cssText = 'border:1px solid #cddde9;border-radius:12px;padding:16px;margin:12px 0;';
+
+  const question = document.createElement('textarea');
+  question.className = 'faq-question';
+  question.placeholder = 'Enter question';
+  question.rows = 2;
+
+  const answer = document.createElement('textarea');
+  answer.className = 'faq-answer';
+  answer.placeholder = 'Enter answer';
+  answer.rows = 3;
+
+  [question, answer].forEach(field => {
+    field.style.cssText = 'display:block;width:100%;margin:8px 0;padding:10px;';
+    box.appendChild(field);
+  });
+
+  const remove = document.createElement('button');
+  remove.type = 'button';
+  remove.textContent = 'Remove Question';
+  remove.onclick = () => box.remove();
+  box.appendChild(remove);
+
+  $('faqItems').appendChild(box);
+};const savedFaqText = String(existing.faq_text || '');
+const savedFaqPairs = savedFaqText.split(/\n\s*\n(?=Q:\s)/);
+
+savedFaqPairs.forEach(entry => {
+  const match = entry.match(/^Q:\s*(.*?)\r?\nA:\s*([\s\S]*)$/);
+  if (!match) return;
+
+  $('addFaqItem').click();
+  const box = $('faqItems').lastElementChild;
+  box.querySelector('.faq-question').value = match[1].trim();
+  box.querySelector('.faq-answer').value = match[2].trim();
+});
  $('campusProfileEditForm').onsubmit=async e=>{
   e.preventDefault();
   const form=e.currentTarget;const data=new FormData(form);
@@ -279,9 +393,38 @@ async function campusProfileForm(campus){
   if(chosenType&&!SCHOOL_TYPES.includes(chosenType)){setStatus('campusProfileStatus','Please choose a valid school type.','error');return;}
   const payload={campus_id:campus.id,updated_at:new Date().toISOString()};
   fields.forEach(([key])=>{payload[key]=String(data.get(key)||'').trim()||null});
+  const faqPairs = [...document.querySelectorAll('#faqItems .faq-item')]
+  .map(box => ({
+    question: box.querySelector('.faq-question').value.trim(),
+    answer: box.querySelector('.faq-answer').value.trim()
+  }))
+  .filter(item => item.question && item.answer);
+
+if (faqPairs.length) {
+  payload.faq_text = faqPairs
+    .map(item => `Q: ${item.question}\nA: ${item.answer}`)
+    .join('\n\n');
+} else {
+  payload.faq_text = existing.faq_text || null;
+}
   const urls=(payload.gallery_urls||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
   if(urls.some(x=>!/^https:\/\//i.test(x))){setStatus('campusProfileStatus','Use HTTPS links for campus photos.','error');return;}
   try{
+   
+const photoFiles = [...document.querySelectorAll('#campusPhotoItems .campus-photo-file')]
+  .flatMap(input => Array.from(input.files || []));
+
+if (photoFiles.length > 0) {
+  const uploadedUrls = [];
+
+  for (const file of photoFiles) {
+    const url = await uploadCampusPhoto(campus.id, file);
+    uploadedUrls.push(url);
+  }
+
+  payload.gallery_urls = [...urls, ...uploadedUrls].join('\n');
+}
+
    await request('/rest/v1/campus_profiles?on_conflict=campus_id',{method:'POST',body:payload,authenticated:true,prefer:'resolution=merge-duplicates,return=minimal'});
    if(chosenType!==(campus.school_type||'')){
     await request('/rest/v1/campuses?id=eq.'+encodeURIComponent(campus.id),{method:'PATCH',body:{school_type:chosenType||null},authenticated:true,prefer:'return=minimal'});
